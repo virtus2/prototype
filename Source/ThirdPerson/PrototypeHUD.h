@@ -12,16 +12,16 @@ class UPrototypeHUDWidget;
 UCLASS()
 class THIRDPERSON_API APrototypeHUD : public AHUD
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
 
 protected:
-	UFUNCTION()
-	virtual void BeginPlay() override;
+    UFUNCTION()
+    virtual void BeginPlay() override;
 
-	UFUNCTION()
-	void InitHUD();
+    UFUNCTION()
+    void InitHUD();
 
 private:
 
@@ -29,11 +29,11 @@ private:
 public:
 
 protected:
-	UPROPERTY(EditDefaultsOnly, Category="HUD")
-	TSubclassOf<UPrototypeHUDWidget> PrototypeHUDWidgetClass;
+    UPROPERTY(EditDefaultsOnly, Category="HUD")
+    TSubclassOf<UPrototypeHUDWidget> PrototypeHUDWidgetClass;
 
-	UPROPERTY()
-	TObjectPtr<UPrototypeHUDWidget> PrototypeHUDWidget;
+    UPROPERTY()
+    TObjectPtr<UPrototypeHUDWidget> PrototypeHUDWidget;
 
 private:
 

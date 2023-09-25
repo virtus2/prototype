@@ -15,33 +15,33 @@ struct FInputActionValue;
 UCLASS()
 class THIRDPERSON_API APrototypeCharacter : public ACharacter
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	APrototypeCharacter();
+    APrototypeCharacter();
 
 protected:
-	virtual void Tick(float DeltaTime) override;
+    virtual void Tick(float DeltaTime) override;
 
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+    virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	virtual void BeginPlay() override;
+    virtual void BeginPlay() override;
 
-	virtual void Move(const FInputActionValue& Value);
+    virtual void Move(const FInputActionValue& Value);
 
-	virtual void Look(const FInputActionValue& Value);
+    virtual void Look(const FInputActionValue& Value);
 
-	virtual void JumpStart(const FInputActionValue& Value);
+    virtual void JumpStart(const FInputActionValue& Value);
 
-	virtual void JumpStop(const FInputActionValue& Value);
+    virtual void JumpStop(const FInputActionValue& Value);
 
-	virtual void FireLeftPressed(const FInputActionValue& Value);
+    virtual void FireLeftPressed(const FInputActionValue& Value);
 
-	virtual void FireLeftReleased(const FInputActionValue& Value);
+    virtual void FireLeftReleased(const FInputActionValue& Value);
 
-	virtual void FireRightPressed(const FInputActionValue& Value);
+    virtual void FireRightPressed(const FInputActionValue& Value);
 
-	virtual void FireRightReleased(const FInputActionValue& Value);
+    virtual void FireRightReleased(const FInputActionValue& Value);
 
 private:
 
@@ -49,53 +49,53 @@ private:
 public:
 
 protected:
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<USpringArmComponent> SpringArmComponent;
+    UPROPERTY(EditAnywhere)
+    TObjectPtr<USpringArmComponent> SpringArmComponent;
 
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<UCameraComponent> CameraComponent;
+    UPROPERTY(EditAnywhere)
+    TObjectPtr<UCameraComponent> CameraComponent;
 
-	// UPROPERTY()
-	// TObjectPtr<UAnimInstance> AnimInstance;
+    // UPROPERTY()
+    // TObjectPtr<UAnimInstance> AnimInstance;
 
-	/*
-		Enhanced Input...
-	*/
-	UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
-	TObjectPtr<UInputMappingContext> InputMapping;
+    /*
+        Enhanced Input...
+    */
+    UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
+    TObjectPtr<UInputMappingContext> InputMapping;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
-	TObjectPtr<UInputAction> MoveAction;
+    UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
+    TObjectPtr<UInputAction> MoveAction;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
-	TObjectPtr<UInputAction> LookAction;
+    UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
+    TObjectPtr<UInputAction> LookAction;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
-	TObjectPtr<UInputAction> JumpAction;
+    UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
+    TObjectPtr<UInputAction> JumpAction;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
-	TObjectPtr<UInputAction> FireLeftAction;
+    UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
+    TObjectPtr<UInputAction> FireLeftAction;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
-	TObjectPtr<UInputAction> FireRightAction;
+    UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
+    TObjectPtr<UInputAction> FireRightAction;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
-	TObjectPtr<UInputAction> SpecialMoveRAction;
+    UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
+    TObjectPtr<UInputAction> SpecialMoveRAction;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
-	TObjectPtr<UInputAction> SpecialMoveEAction;
+    UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
+    TObjectPtr<UInputAction> SpecialMoveEAction;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
-	TObjectPtr<UInputAction> SpecialMoveQAction;
+    UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
+    TObjectPtr<UInputAction> SpecialMoveQAction;
 
-	/*
-		Character Status... 
-	*/
-	UPROPERTY(EditDefaultsOnly, Category ="Character Status")
-	float CurrentHealthPoint;
+    /*
+        Character Status... 
+    */
+    UPROPERTY(EditDefaultsOnly, Category ="Character Status")
+    float CurrentHealthPoint;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Character Status")
-	float MaxHealthPoint;
+    UPROPERTY(EditDefaultsOnly, Category = "Character Status")
+    float MaxHealthPoint;
 
 
 private:

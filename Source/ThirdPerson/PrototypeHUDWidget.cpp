@@ -9,8 +9,8 @@
 
 void UPrototypeHUDWidget::UpdateHealth(float CurrentHealthPoint, float MaxHealthPoint)
 {
-	float percent = CurrentHealthPoint / (MaxHealthPoint + 0.00001f); 
-	HealthPointProgressBar->SetPercent(percent);
-	
-	HealthPointTextBlock->SetText(FText::AsNumber(CurrentHealthPoint));
+    float percent = CurrentHealthPoint / (MaxHealthPoint + 0.00001f); 
+    HealthPointProgressBar->SetPercent(percent);
+    
+    HealthPointTextBlock->SetText(FText::AsNumber(CurrentHealthPoint));
 }

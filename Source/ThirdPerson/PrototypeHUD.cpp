@@ -9,14 +9,14 @@
 
 void APrototypeHUD::BeginPlay()
 {
-	InitHUD();
+    InitHUD();
 }
 
 void APrototypeHUD::InitHUD()
 {
-	PrototypeHUDWidget = CreateWidget<UPrototypeHUDWidget>(PlayerOwner, PrototypeHUDWidgetClass);
-	if (PrototypeHUDWidget)
-	{
-		PrototypeHUDWidget->AddToViewport();
-	}
+    PrototypeHUDWidget = CreateWidget<UPrototypeHUDWidget>(PlayerOwner, PrototypeHUDWidgetClass);
+    if (PrototypeHUDWidget)
+    {
+        PrototypeHUDWidget->AddToViewport();
+    }
 }

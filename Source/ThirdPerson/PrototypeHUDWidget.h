@@ -12,11 +12,11 @@ class UProgressBar;
 UCLASS()
 class THIRDPERSON_API UPrototypeHUDWidget : public UUserWidget
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable)
-	void UpdateHealth(float CurrentHealthPoint, float MaxHealthPoint);
+    UFUNCTION(BlueprintCallable)
+    void UpdateHealth(float CurrentHealthPoint, float MaxHealthPoint);
 
 protected:
 
@@ -27,13 +27,13 @@ public:
 
 
 protected:
-	UPROPERTY(EditAnywhere, meta=(BindWidget))
-	TObjectPtr<UTextBlock> HealthPointTextBlock;
+    UPROPERTY(EditAnywhere, meta=(BindWidget))
+    TObjectPtr<UTextBlock> HealthPointTextBlock;
 
-	UPROPERTY(EditAnywhere, meta=(BindWidget))
-	TObjectPtr<UProgressBar> HealthPointProgressBar;
+    UPROPERTY(EditAnywhere, meta=(BindWidget))
+    TObjectPtr<UProgressBar> HealthPointProgressBar;
 
 private:
 
-	
+    
 };
