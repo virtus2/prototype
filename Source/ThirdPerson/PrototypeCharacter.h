@@ -11,6 +11,7 @@ class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
+struct FTimerHandle;
 
 UCLASS()
 class THIRDPERSON_API APrototypeCharacter : public ACharacter
@@ -35,13 +36,19 @@ protected:
 
     virtual void JumpStop(const FInputActionValue& Value);
 
-    virtual void FireLeftPressed(const FInputActionValue& Value);
+    virtual void BasicFireStart(const FInputActionValue& Value);
 
-    virtual void FireLeftReleased(const FInputActionValue& Value);
+    virtual void BasicFireStop(const FInputActionValue& Value);
 
-    virtual void FireRightPressed(const FInputActionValue& Value);
+    virtual void SkillUseStart(const FInputActionValue& Value);
 
-    virtual void FireRightReleased(const FInputActionValue& Value);
+    virtual void SkillUseStop(const FInputActionValue& Value);
+
+    virtual void TryBasicFire();
+
+    virtual void BasicFire();
+
+    virtual void BasicFireTimerFinished();
 
 private:
 
@@ -54,9 +61,6 @@ protected:
 
     UPROPERTY(EditAnywhere)
     TObjectPtr<UCameraComponent> CameraComponent;
-
-    // UPROPERTY()
-    // TObjectPtr<UAnimInstance> AnimInstance;
 
     /*
         Enhanced Input...
@@ -74,10 +78,10 @@ protected:
     TObjectPtr<UInputAction> JumpAction;
 
     UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
-    TObjectPtr<UInputAction> FireLeftAction;
+    TObjectPtr<UInputAction> BasicFireAction;
 
     UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
-    TObjectPtr<UInputAction> FireRightAction;
+    TObjectPtr<UInputAction> SkillAction;
 
     UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
     TObjectPtr<UInputAction> SpecialMoveRAction;
@@ -96,6 +100,17 @@ protected:
 
     UPROPERTY(EditDefaultsOnly, Category = "Character Status")
     float MaxHealthPoint;
+
+    UPROPERTY(VisibleAnywhere, Category="Character Status|Combat")
+    bool bBasicFireStarted;
+
+    UPROPERTY(VisibleAnywhere, Category = "Character Status|Combat")
+    bool bBasicFireReady = true;
+    
+    UPROPERTY(EditDefaultsOnly, Category = "Character Status|Combat")
+    float BasicFireDelay;
+
+    FTimerHandle BasicFireTimerHandle;
 
 
 private:

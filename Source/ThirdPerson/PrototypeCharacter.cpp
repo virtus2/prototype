@@ -57,10 +57,10 @@ void APrototypeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
     EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APrototypeCharacter::Look);
     EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &APrototypeCharacter::JumpStart);
     EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &APrototypeCharacter::JumpStop);
-    EnhancedInputComponent->BindAction(FireLeftAction, ETriggerEvent::Started, this, &APrototypeCharacter::FireLeftPressed);
-    EnhancedInputComponent->BindAction(FireLeftAction, ETriggerEvent::Completed, this, &APrototypeCharacter::FireLeftReleased);
-    EnhancedInputComponent->BindAction(FireRightAction, ETriggerEvent::Started, this, &APrototypeCharacter::FireRightPressed);
-    EnhancedInputComponent->BindAction(FireRightAction, ETriggerEvent::Completed, this, &APrototypeCharacter::FireRightReleased);
+    EnhancedInputComponent->BindAction(BasicFireAction, ETriggerEvent::Started, this, &APrototypeCharacter::BasicFireStart);
+    EnhancedInputComponent->BindAction(BasicFireAction, ETriggerEvent::Completed, this, &APrototypeCharacter::BasicFireStop);
+    EnhancedInputComponent->BindAction(SkillAction, ETriggerEvent::Started, this, &APrototypeCharacter::SkillUseStart);
+    EnhancedInputComponent->BindAction(SkillAction, ETriggerEvent::Completed, this, &APrototypeCharacter::SkillUseStop);
 }
 
 void APrototypeCharacter::Move(const FInputActionValue& Value)
@@ -96,21 +96,50 @@ void APrototypeCharacter::JumpStop(const FInputActionValue& Value)
     StopJumping();
 }
 
-void APrototypeCharacter::FireLeftPressed(const FInputActionValue& Value)
+void APrototypeCharacter::BasicFireStart(const FInputActionValue& Value)
 {
-
+    bBasicFireStarted = true;
+    TryBasicFire();
 }
 
-void APrototypeCharacter::FireLeftReleased(const FInputActionValue& Value)
+void APrototypeCharacter::BasicFireStop(const FInputActionValue& Value)
+{
+    bBasicFireStarted = false;
+}
+
+void APrototypeCharacter::SkillUseStart(const FInputActionValue& Value)
 {
 }
 
-void APrototypeCharacter::FireRightPressed(const FInputActionValue& Value)
+void APrototypeCharacter::SkillUseStop(const FInputActionValue& Value)
 {
 }
 
-void APrototypeCharacter::FireRightReleased(const FInputActionValue& Value)
+void APrototypeCharacter::TryBasicFire()
 {
+    if (bBasicFireStarted)
+    {
+        if (bBasicFireReady)
+        {
+            BasicFire();
+        }
+    }
+}
+
+void APrototypeCharacter::BasicFire()
+{
+    bBasicFireReady = false;
+    GetWorldTimerManager().SetTimer(BasicFireTimerHandle, this, &APrototypeCharacter::BasicFireTimerFinished, BasicFireDelay);
+    UE_LOG(LogTemp, Warning, TEXT("Fire!!"));
+}
+
+void APrototypeCharacter::BasicFireTimerFinished()
+{
+    bBasicFireReady = true;
+    if (bBasicFireStarted)
+    {
+        TryBasicFire();
+    }
 }
 
 
