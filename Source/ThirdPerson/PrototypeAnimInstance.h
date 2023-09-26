@@ -40,6 +40,12 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "States")
     bool bIsHit;
 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "States")
+    bool bIsFirstFrameOfTurnAnim;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "States")
+    bool bIsTurnAnimPlaying;
+
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Variables")
     float Speed;
 
@@ -88,6 +94,7 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadOnly)
     TObjectPtr<APawn> PawnOwner;
 
+
 private:
     /* lower number is more intense */
     UPROPERTY(EditAnywhere, Meta=(AllowPrivateAccess=true))
@@ -96,9 +103,4 @@ private:
     UPROPERTY(EditAnywhere, Meta = (AllowPrivateAccess = true))
     float LeanInterpSpeed = 6.0f;
 
-    UPROPERTY()
-    bool bIsFirstFrameOfTurnAnim = false;
-
-    UPROPERTY()
-    bool bIsTurnAnimPlaying = false;
 };

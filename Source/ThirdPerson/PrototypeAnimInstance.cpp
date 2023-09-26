@@ -78,10 +78,12 @@ void UPrototypeAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
     {
         // If Character is moving
         RootYawOffset = UKismetMathLibrary::FInterpTo(RootYawOffset, 0.0f, DeltaSeconds, 15.0f);
+        RootYawOffset = FMath::Clamp(RootYawOffset, -180, 180);
     }
     else
     {
         RootYawOffset += YawChangeOverFrame;
+        RootYawOffset = FMath::Clamp(RootYawOffset, -180, 180);
         
         float TurnAnimCurveValue;
         GetCurveValue(TEXT("TurnAnim"), TurnAnimCurveValue);
