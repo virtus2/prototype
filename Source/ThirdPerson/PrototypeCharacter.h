@@ -10,6 +10,7 @@ class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
+class UAnimMontage;
 struct FInputActionValue;
 struct FTimerHandle;
 
@@ -50,6 +51,12 @@ protected:
 
     virtual void BasicFireTimerFinished();
 
+    virtual void ComboAttackSave();
+
+    virtual void ResetCombo();
+
+    void HitScanLineTrace();
+
 private:
 
 
@@ -61,6 +68,9 @@ protected:
 
     UPROPERTY(EditAnywhere)
     TObjectPtr<UCameraComponent> CameraComponent;
+
+    UPROPERTY(EditAnywhere)
+    TObjectPtr<UAnimMontage> BasicFireAnimMontage;
 
     /*
         Enhanced Input...
@@ -101,6 +111,12 @@ protected:
     UPROPERTY(EditDefaultsOnly, Category = "Character Status")
     float MaxHealthPoint;
 
+    UPROPERTY(VisibleAnywhere, Category = "Character Status|Combat")
+    bool bSaveAttack;
+
+    UPROPERTY(VisibleAnywhere, Category = "Character Status|Combat")
+    bool bResetCombo;
+
     UPROPERTY(VisibleAnywhere, Category="Character Status|Combat")
     bool bBasicFireStarted;
 
@@ -111,6 +127,8 @@ protected:
     float BasicFireDelay;
 
     FTimerHandle BasicFireTimerHandle;
+
+    int AttackCount;
 
 
 private:
