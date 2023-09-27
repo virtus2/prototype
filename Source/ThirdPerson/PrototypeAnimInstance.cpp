@@ -10,21 +10,29 @@ UPrototypeAnimInstance::UPrototypeAnimInstance()
 {
 }
 
-void UPrototypeAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
+void UPrototypeAnimInstance::NativeInitializeAnimation()
 {
     PawnOwner = TryGetPawnOwner();
+    if (IsValid(PawnOwner))
+    {
+        Character = Cast<ACharacter>(PawnOwner);
+        if (IsValid(Character))
+        {
+            CharacterMovement = Character->GetCharacterMovement();
+        }
+    }
+}
+
+void UPrototypeAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
+{
     if (!IsValid(PawnOwner))
     {
         return;
     }
-
-    Character = Cast<ACharacter>(PawnOwner);
     if (!IsValid(Character))
     {
         return;
     }
-
-    auto CharacterMovement = Character->GetCharacterMovement();
     if (!IsValid(CharacterMovement))
     {
         return;
@@ -109,4 +117,12 @@ void UPrototypeAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
             bIsFirstFrameOfTurnAnim = true;
         }
     }
+}
+
+void UPrototypeAnimInstance::AnimNotify_SaveAttack()
+{
+}
+
+void UPrototypeAnimInstance::AnimNotify_ResetCombo()
+{
 }

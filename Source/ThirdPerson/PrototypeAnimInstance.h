@@ -8,6 +8,7 @@
 
 class APawn;
 class ACharacter;
+class UCharacterMovementComponent;
 
 UCLASS()
 class THIRDPERSON_API UPrototypeAnimInstance : public UAnimInstance
@@ -18,7 +19,15 @@ public:
     UPrototypeAnimInstance();
 
 protected:
+    virtual void NativeInitializeAnimation() override;
+
     virtual void NativeUpdateAnimation(float DeltaSeconds) override;
+
+    UFUNCTION()
+    void AnimNotify_SaveAttack();
+
+    UFUNCTION()
+    void AnimNotify_ResetCombo();
 
 private:
 
@@ -88,11 +97,14 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadOnly)
     FRotator RotationLastTick;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly)
+    UPROPERTY(BlueprintReadOnly)
     TObjectPtr<ACharacter> Character;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly)
+    UPROPERTY(BlueprintReadOnly)
     TObjectPtr<APawn> PawnOwner;
+
+    UPROPERTY(BlueprintReadOnly)
+    TObjectPtr<UCharacterMovementComponent> CharacterMovement;
 
 
 private:
