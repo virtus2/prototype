@@ -245,55 +245,55 @@ void APrototypeCharacter::HitScanLineTrace()
     }
 
     // 4. 총구 방향에서 라인트레이스
-    FVector CharacterSightLineTraceStart = GetMesh()->GetSocketLocation(TEXT("hand_lSocket"));
-    FVector CharacterSightLineTraceEnd;
+    FVector MuzzleLineTraceStart = GetMesh()->GetSocketLocation(TEXT("hand_lSocket"));
+    FVector MuzzleLineTraceEnd;
     if (bIsAimLineTraceHit)
     {
-        // 4-1. 조준점 라인 트레이스가 충돌했으면 캐릭터에서 충돌지점으로 라인트레이스를 한다.
-        FVector CharacterSightLineTraceDirection = (AimLineTraceHitResult.ImpactPoint - CharacterSightLineTraceStart);
-        CharacterSightLineTraceDirection.Normalize();
-        CharacterSightLineTraceEnd = CharacterSightLineTraceStart + CharacterSightLineTraceDirection * 10000.0f;
+        // 4-1. 조준점 라인 트레이스가 충돌했으면 총구에서 충돌지점으로 라인트레이스를 한다.
+        FVector MuzzleLineTraceDirection = (AimLineTraceHitResult.ImpactPoint - MuzzleLineTraceStart);
+        MuzzleLineTraceDirection.Normalize();
+        MuzzleLineTraceEnd = MuzzleLineTraceStart + MuzzleLineTraceDirection * 10000.0f;
     }
     else
     {
         // 4-2. 조준점 라인 트레이스가 충돌하지 않았으면 조준점 라인트레이스의 TraceEnd를 사용한다.
         //      이때 길이를 그대로 사용하면 멀리 있는 캐릭터도 총구 방향에 따라 맞출 수 있기 때문에,
         //      게임 플레이 경험을 위해서 짧게 조정해준다.
-        CharacterSightLineTraceEnd = AimLineTraceHitResult.TraceEnd * 0.000001f;
+        MuzzleLineTraceEnd = AimLineTraceHitResult.TraceEnd * 0.000001f;
     }
 
-    FHitResult CharacterSightLineTraceHitResult;
-    bool bIsCharacterSightLineTraceHit = World->LineTraceSingleByChannel(
-        CharacterSightLineTraceHitResult,
-        CharacterSightLineTraceStart,
-        CharacterSightLineTraceEnd,
+    FHitResult MuzzleLineTraceHitResult;
+    bool bIsMuzzleLineTraceHit = World->LineTraceSingleByChannel(
+        MuzzleLineTraceHitResult,
+        MuzzleLineTraceStart,
+        MuzzleLineTraceEnd,
         ECC_GameTraceChannel1, // Custom Collision Channel: HitScan. See DefaultEngine.ini 
         LineTraceParams
     );
 
-    TObjectPtr<ACharacter> CharacterLineTraceHitCharacter;
-    if (bIsCharacterSightLineTraceHit)
+    TObjectPtr<ACharacter> MuzzleLineTraceHitCharacter;
+    if (bIsMuzzleLineTraceHit)
     {
-        CharacterLineTraceHitCharacter = Cast<ACharacter>(CharacterSightLineTraceHitResult.GetActor());
+        MuzzleLineTraceHitCharacter = Cast<ACharacter>(MuzzleLineTraceHitResult.GetActor());
     }
 
-    // 5. 조준점 라인트레이스로 맞은 캐릭터가 없는 경우 캐릭터 라인트레이스로 히트 판정을 내린다. 
-    //    초근접 상황에서는 조준점 라인트레이스는 맞지 않고 캐릭터 라인트레이스만 맞기 때문.
-    if (IsValid(CharacterLineTraceHitCharacter) && !IsValid(AimLineTraceHitCharacter))
+    // 5. 조준점 라인트레이스로 맞은 캐릭터가 없는 경우 총구 라인트레이스로 히트 판정을 내린다. 
+    //    근접 상황에서는 조준점 라인트레이스는 맞지 않고 총구 라인트레이스만 맞기 때문.
+    if (IsValid(MuzzleLineTraceHitCharacter) && !IsValid(AimLineTraceHitCharacter))
     {
-        DrawDebugLine(World, CharacterSightLineTraceStart, CharacterSightLineTraceEnd, FColor(0, 255, 0));
-        UE_LOG(LogTemp, Warning, TEXT("Close Hit: %s"), *CharacterLineTraceHitCharacter.GetFullName());
+        DrawDebugLine(World, MuzzleLineTraceStart, MuzzleLineTraceEnd, FColor(0, 255, 0));
+        UE_LOG(LogTemp, Warning, TEXT("Close Hit: %s"), *MuzzleLineTraceHitCharacter.GetFullName());
     }
 
     // 6. 조준점 라인트레이스 히트 결과 거리가 멀면 캐릭터 라인트레이스와 결과가 같을 때 히트 판정을 내린다.
     //    벽 뒤에서 쏠 때 총구가 벽에 막히게 하기 위함.
     if(bIsAimTraceHitTooFar)
     {
-        if (IsValid(AimLineTraceHitCharacter) && IsValid(CharacterLineTraceHitCharacter))
+        if (IsValid(AimLineTraceHitCharacter) && IsValid(MuzzleLineTraceHitCharacter))
         {
             DrawDebugLine(World, AimLineTraceStart, AimLineTraceEnd, FColor(0, 255, 0));
-            DrawDebugLine(World, CharacterSightLineTraceStart, CharacterSightLineTraceEnd, FColor(0, 255, 0));
-            UE_LOG(LogTemp, Warning, TEXT("Far Hit: %s"), *CharacterLineTraceHitCharacter.GetFullName());
+            DrawDebugLine(World, MuzzleLineTraceStart, MuzzleLineTraceEnd, FColor(0, 255, 0));
+            UE_LOG(LogTemp, Warning, TEXT("Far Hit: %s"), *MuzzleLineTraceHitCharacter.GetFullName());
         }
     }
 }
