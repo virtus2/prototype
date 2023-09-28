@@ -298,4 +298,8 @@ void APrototypeCharacter::HitScanLineTrace()
     }
 }
 
+void APrototypeCharacter::LoadStatusFromTable()
+{
+}
+
 
