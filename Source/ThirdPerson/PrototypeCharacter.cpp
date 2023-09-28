@@ -4,11 +4,12 @@
 #include "PrototypeCharacter.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "GameFramework/SpringArmComponent.h"    
+#include "GameFramework/SpringArmComponent.h"  
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
+#include "ThirdPerson/PrototypeAnimInstance.h"
 
 APrototypeCharacter::APrototypeCharacter()
 {
@@ -182,124 +183,119 @@ void APrototypeCharacter::ResetCombo()
 
 void APrototypeCharacter::HitScanLineTrace()
 {
-    FVector2D ViewportSize;
-    if (!IsValid(GEngine))
-    {
-        return;
-    }
-    if (!IsValid(GEngine->GameViewport))
-    {
-        return;
-    }
-
-    // 1. 조준점(스크린의 정 가운데)의 월드 좌표와 방향벡터를 구한다.
-    GEngine->GameViewport->GetViewportSize(ViewportSize);
-    FVector2D ViewportCenter(ViewportSize.X * 0.5f, ViewportSize.Y * 0.5f);
-    FVector AimWorldPosition;
-    FVector AimWorldDirection;
-    bool DeprojectionSuccess = UGameplayStatics::DeprojectScreenToWorld(Cast<APlayerController>(Controller), ViewportCenter, AimWorldPosition, AimWorldDirection);
-    if (!DeprojectionSuccess)
-    {
-        return;
-    }
-
-    auto World = GetWorld();
+    TObjectPtr<UWorld> World = GetWorld();
     if (!IsValid(World))
     {
         return;
     }
 
-    // 2. 조준점의 방향으로 라인트레이스를 해서 충돌하는 첫번째 캐릭터를 구한다.
-    FVector AimLineTraceStart = AimWorldPosition + AimWorldDirection; 
-    FVector AimLineTraceEnd = AimLineTraceStart + AimWorldDirection * 1500.0f;
+    auto PlayerController = Cast<APlayerController>(Controller);
+    if (!IsValid(PlayerController))
+    {
+        return;
+    }
 
-    FCollisionQueryParams AimLineTraceParams;
-    AimLineTraceParams.AddIgnoredActor(this);
+    auto PlayerCameraManager = PlayerController->PlayerCameraManager;
+    if (!IsValid(PlayerCameraManager))
+    {
+        return;
+    }
+
+    // 라인트레이스를 쏘는 캐릭터는 제외한다.
+    FCollisionQueryParams LineTraceParams;
+    LineTraceParams.AddIgnoredActor(this);
+
+    // 1. 조준점의 방향으로 라인트레이스를 해서 충돌하는 첫번째 캐릭터를 구한다.
+    FVector AimLineTraceStart = PlayerCameraManager->GetCameraLocation(); 
+    FVector AimLineTraceEnd = AimLineTraceStart + PlayerCameraManager->GetActorForwardVector() * 10000.0f; 
 
     FHitResult AimLineTraceHitResult;
-    bool AimLineTraceHit = World->LineTraceSingleByChannel(
+    bool bIsAimLineTraceHit = World->LineTraceSingleByChannel(
         AimLineTraceHitResult,
         AimLineTraceStart,
         AimLineTraceEnd,
         ECC_GameTraceChannel1, // Custom Collision Channel: HitScan. See DefaultEngine.ini 
-        AimLineTraceParams
+        LineTraceParams
     );
 
-    bool bIsTraceHitTooClose = false;
+    bool bIsAimTraceHitTooFar = false;
     TObjectPtr<ACharacter> AimLineTraceHitCharacter;
-    if (AimLineTraceHit)
+    if (bIsAimLineTraceHit)
     {
         AimLineTraceHitCharacter = Cast<ACharacter>(AimLineTraceHitResult.GetActor());
         if (IsValid(AimLineTraceHitCharacter))
         {
-            // 3. 히트된 캐릭터가 뒤나 옆에 있는지 판단한다.
+            // 2. 히트된 캐릭터가 뒤나 옆에 있는지 판단한다.
             FVector ActorLocationToImpactPoint = (AimLineTraceHitResult.ImpactPoint - GetActorLocation());
             FVector HitDirection = ActorLocationToImpactPoint.GetSafeNormal();
             float dot = GetActorForwardVector().GetSafeNormal().Dot(HitDirection);
-            // UE_LOG(LogTemp, Warning, TEXT("Dot:%f"), dot)
-            // TODO: 적당한 값을 정하자
             if (dot <= 0.3f) 
             {
                 return;
             }
 
-            // 4. 히트된 캐릭터까지의 거리가 가까운지 판단한다.
+            // 3. 히트된 캐릭터까지의 거리가 먼지 판단한다.
             float SqrDistanceToHitCharacter = ActorLocationToImpactPoint.SizeSquared();
-            // UE_LOG(LogTemp, Warning, TEXT("Distance: %f"), SqrDistanceToHitCharacter)
-            if (SqrDistanceToHitCharacter < 17500.0f)
+            if (SqrDistanceToHitCharacter >= 17500.0f)
             {
-                DrawDebugLine(World, GetActorLocation(), AimLineTraceHitResult.ImpactPoint, FColor(255, 0, 0));
-                bIsTraceHitTooClose = true;
+                bIsAimTraceHitTooFar = true;
             }
         }
     }
 
-    // 5. 캐릭터에서 충돌지점으로 라인트레이스를 한다.
-    FVector CharacterSightLineTraceStart = GetActorLocation();
-    FVector CharacterSightLineTraceDirection = (AimLineTraceHitResult.ImpactPoint - CharacterSightLineTraceStart);
-    CharacterSightLineTraceDirection.Normalize();
-    FVector CharacterSightLineTraceEnd = CharacterSightLineTraceStart + CharacterSightLineTraceDirection * 1500.0f;
-
-    FCollisionQueryParams CharacterLineTraceParams;
-    CharacterLineTraceParams.AddIgnoredActor(this);
+    // 4. 총구 방향에서 라인트레이스
+    FVector CharacterSightLineTraceStart = GetMesh()->GetSocketLocation(TEXT("hand_lSocket"));
+    FVector CharacterSightLineTraceEnd;
+    if (bIsAimLineTraceHit)
+    {
+        // 4-1. 조준점 라인 트레이스가 충돌했으면 캐릭터에서 충돌지점으로 라인트레이스를 한다.
+        FVector CharacterSightLineTraceDirection = (AimLineTraceHitResult.ImpactPoint - CharacterSightLineTraceStart);
+        CharacterSightLineTraceDirection.Normalize();
+        CharacterSightLineTraceEnd = CharacterSightLineTraceStart + CharacterSightLineTraceDirection * 10000.0f;
+    }
+    else
+    {
+        // 4-2. 조준점 라인 트레이스가 충돌하지 않았으면 조준점 라인트레이스의 TraceEnd를 사용한다.
+        //      이때 길이를 그대로 사용하면 멀리 있는 캐릭터도 총구 방향에 따라 맞출 수 있기 때문에 짧게 조정해준다.
+        CharacterSightLineTraceEnd = AimLineTraceHitResult.TraceEnd * 0.000001f;
+    }
 
     FHitResult CharacterSightLineTraceHitResult;
-    bool CharacterLineTraceHit = World->LineTraceSingleByChannel(
+    bool bIsCharacterSightLineTraceHit = World->LineTraceSingleByChannel(
         CharacterSightLineTraceHitResult,
         CharacterSightLineTraceStart,
         CharacterSightLineTraceEnd,
         ECC_GameTraceChannel1, // Custom Collision Channel: HitScan. See DefaultEngine.ini 
-        CharacterLineTraceParams
+        LineTraceParams
     );
 
     TObjectPtr<ACharacter> CharacterLineTraceHitCharacter;
-    if (CharacterLineTraceHit)
+    if (bIsCharacterSightLineTraceHit)
     {
         CharacterLineTraceHitCharacter = Cast<ACharacter>(CharacterSightLineTraceHitResult.GetActor());
     }
 
-    // 6. 충돌한 캐릭터와 거리가 가까우면 캐릭터 라인트레이스만으로 히트 판정을 내린다.
-    if (bIsTraceHitTooClose)
+    // 5. 조준점 라인트레이스로 맞은 캐릭터가 없는 경우 캐릭터 라인트레이스로 히트 판정을 내린다. 
+    //    초근접 상황에서는 조준점 라인트레이스는 맞지 않고 캐릭터 라인트레이스만 맞기 때문.
+    if (IsValid(CharacterLineTraceHitCharacter) && !IsValid(AimLineTraceHitCharacter))
     {
-        if (IsValid(CharacterLineTraceHitCharacter))
-        {
-            DrawDebugLine(World, CharacterSightLineTraceStart, CharacterSightLineTraceEnd, FColor(0, 255, 0));
-            UE_LOG(LogTemp, Warning, TEXT("%s"), *CharacterLineTraceHitCharacter.GetFullName());
-        }
+        DrawDebugLine(World, CharacterSightLineTraceStart, CharacterSightLineTraceEnd, FColor(0, 255, 0));
+        UE_LOG(LogTemp, Warning, TEXT("Close Hit: %s"), *CharacterLineTraceHitCharacter.GetFullName());
     }
-    else
+
+    // 7. 조준점 라인트레이스 히트 결과 거리가 멀면 캐릭터 라인트레이스와 결과가 같을 때 히트 판정을 내린다.
+    //    벽 뒤에서 쏠 때 총구가 벽에 막히게 하기 위함.
+    if(bIsAimTraceHitTooFar)
     {
-        // 7. 거리가 멀면 조준점, 캐릭터 라인트레이스 결과가 같을때 히트 판정을 내린다. (벽 뒤에서 쏠 때 총구가 벽에 막히게 하기 위함)
         if (IsValid(AimLineTraceHitCharacter) && IsValid(CharacterLineTraceHitCharacter))
         {
             DrawDebugLine(World, AimLineTraceStart, AimLineTraceEnd, FColor(0, 255, 0));
             DrawDebugLine(World, CharacterSightLineTraceStart, CharacterSightLineTraceEnd, FColor(0, 255, 0));
-            UE_LOG(LogTemp, Warning, TEXT("%s"), *CharacterLineTraceHitCharacter.GetFullName());
+            UE_LOG(LogTemp, Warning, TEXT("Far Hit: %s"), *CharacterLineTraceHitCharacter.GetFullName());
         }
     }
-
-    // TODO: 초근접 상황에서 조준점 라인트레이스는 안맞았는데 캐릭터 총구에서 발사해서 맞는 경우도 있음... 수정해야됨
-
+    
+    
 }
 
 
