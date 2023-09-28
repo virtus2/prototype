@@ -226,6 +226,7 @@ void APrototypeCharacter::HitScanLineTrace()
         if (IsValid(AimLineTraceHitCharacter))
         {
             // 2. 히트된 캐릭터가 뒤나 옆에 있는지 판단한다.
+            // (라인트레이스 시작지점을 캐릭터 거리만큼 더해줘도 되긴 할 것 같다.)
             FVector ActorLocationToImpactPoint = (AimLineTraceHitResult.ImpactPoint - GetActorLocation());
             FVector HitDirection = ActorLocationToImpactPoint.GetSafeNormal();
             float dot = GetActorForwardVector().GetSafeNormal().Dot(HitDirection);
@@ -256,7 +257,8 @@ void APrototypeCharacter::HitScanLineTrace()
     else
     {
         // 4-2. 조준점 라인 트레이스가 충돌하지 않았으면 조준점 라인트레이스의 TraceEnd를 사용한다.
-        //      이때 길이를 그대로 사용하면 멀리 있는 캐릭터도 총구 방향에 따라 맞출 수 있기 때문에 짧게 조정해준다.
+        //      이때 길이를 그대로 사용하면 멀리 있는 캐릭터도 총구 방향에 따라 맞출 수 있기 때문에,
+        //      게임 플레이 경험을 위해서 짧게 조정해준다.
         CharacterSightLineTraceEnd = AimLineTraceHitResult.TraceEnd * 0.000001f;
     }
 
@@ -283,7 +285,7 @@ void APrototypeCharacter::HitScanLineTrace()
         UE_LOG(LogTemp, Warning, TEXT("Close Hit: %s"), *CharacterLineTraceHitCharacter.GetFullName());
     }
 
-    // 7. 조준점 라인트레이스 히트 결과 거리가 멀면 캐릭터 라인트레이스와 결과가 같을 때 히트 판정을 내린다.
+    // 6. 조준점 라인트레이스 히트 결과 거리가 멀면 캐릭터 라인트레이스와 결과가 같을 때 히트 판정을 내린다.
     //    벽 뒤에서 쏠 때 총구가 벽에 막히게 하기 위함.
     if(bIsAimTraceHitTooFar)
     {
@@ -294,8 +296,6 @@ void APrototypeCharacter::HitScanLineTrace()
             UE_LOG(LogTemp, Warning, TEXT("Far Hit: %s"), *CharacterLineTraceHitCharacter.GetFullName());
         }
     }
-    
-    
 }
 
 
