@@ -12,13 +12,15 @@ class UInputMappingContext;
 class UInputAction;
 class UAnimMontage;
 class UPrototypeAnimInstance;
+class UPrototypeAttributeSet;
+class UGameplayEffect;
 struct FInputActionValue;
 struct FTimerHandle;
 
 USTRUCT(BlueprintType)
 struct FPrototypeCharacterStatus : public FTableRowBase
 {
-    GENERATED_BODY()
+    GENERATED_USTRUCT_BODY()
 
 public:
     FPrototypeCharacterStatus()
@@ -61,42 +63,47 @@ class THIRDPERSON_API APrototypeCharacter : public ACharacter
 public:
     APrototypeCharacter();
 
+    virtual void BeginPlay() override;
+    virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 protected:
     virtual void Tick(float DeltaTime) override;
-
+    virtual void PossessedBy(AController* NewController) override;
     virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-    virtual void BeginPlay() override;
+    // Initialize the Character's attributes. Must run on Server but we run it on Client too
+    // so that we don't have to wait. The Server's replication to the Client won't matter since
+    // the values should be the same.
+    virtual void InitializeAttributes();
+    /*
+    virtual void OnAbilitySystemInitialized();
+    virtual void OnAbilitySystemUninitialized();
+
+    virtual void PossessedBy(AController* NewController) override;
+    virtual void UnPossessed() override;
+    
+    virtual void OnRep_Controller() override;
+    virtual void OnRep_PlayerState() override;
+    */
 
     virtual void Move(const FInputActionValue& Value);
-
     virtual void Look(const FInputActionValue& Value);
-
     virtual void JumpStart(const FInputActionValue& Value);
-
     virtual void JumpStop(const FInputActionValue& Value);
 
     virtual void BasicFireStart(const FInputActionValue& Value);
-
     virtual void BasicFireStop(const FInputActionValue& Value);
-
     virtual void SkillUseStart(const FInputActionValue& Value);
-
     virtual void SkillUseStop(const FInputActionValue& Value);
 
     virtual void TryBasicFire();
-
     virtual void BasicFire();
-
     virtual void BasicFireTimerFinished();
-
     virtual void ComboAttackSave();
-
     virtual void ResetCombo();
 
     void HitScanLineTrace();
 
-    void LoadStatusFromTable();
 
 private:
 
@@ -170,6 +177,18 @@ protected:
     FTimerHandle BasicFireTimerHandle;
 
     int AttackCount;
+
+
+    /*
+     * 어빌리티 시스템 테스트
+     */
+    UPROPERTY()
+    TObjectPtr<UPrototypeAttributeSet> AttributeSet;
+
+    // Default attributes for a character for initializing on spawn/respawn.
+    // This is an instant GE that overrides the values for attributes that get reset on spawn/respawn.
+    UPROPERTY(BlueprintReadOnly, EditAnywhere)
+    TSubclassOf<UGameplayEffect> DefaultAttributes;
 
 
 private:

@@ -7,6 +7,7 @@
 #include "GameFramework/PlayerState.h"
 #include "PrototypePlayerState.generated.h"
 
+class AController;
 class APrototypePlayerController;
 class UAbilitySystemComponent;
 class UPrototypeAbilitySystemComponent;
@@ -26,6 +27,18 @@ public:
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
+	//~AActor interface
+	virtual void BeginPlay() override;
+	virtual void PreInitializeComponents() override;
+	virtual void PostInitializeComponents() override;
+	//~End of AActor interface
+	
+	// ~APlayerState interface
+	virtual void ClientInitialize(AController* C) override;
+	virtual void OnDeactivated();
+	virtual void OnReactivated();
+	// ~End of APlayerState interface
+
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 
@@ -36,10 +49,10 @@ public:
 protected:
 
 private:
-	/* 
-	액터가 소멸되어 리스폰될 수 있는 경우에는 어빌리티 시스템 컴포넌트를 플레이어 스테이트에 보관하는 것이 좋다. 
-	다수의 액터가 하나의 어빌리티 시스템 컴포넌트를 공유할 수 있다.
-	*/
+	/**
+	 * 액터가 소멸되어 리스폰될 수 있는 경우에는 어빌리티 시스템 컴포넌트를 플레이어 스테이트에 보관하는 것이 좋다. 
+	 * 다수의 액터가 하나의 어빌리티 시스템 컴포넌트를 공유할 수 있다.
+	 */
 	UPROPERTY(VisibleAnywhere, Category = "Prototype|PlayerState")
 	TObjectPtr<UPrototypeAbilitySystemComponent> AbilitySystemComponent;
 };

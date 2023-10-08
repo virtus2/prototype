@@ -2,6 +2,7 @@
 
 
 #include "PrototypeCharacter.h"
+
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "GameFramework/SpringArmComponent.h"  
@@ -9,7 +10,12 @@
 #include "Camera/CameraComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
+#include "UObject/ConstructorHelpers.h"
+#include "ThirdPerson/PrototypeAbilitySystemComponent.h"
 #include "ThirdPerson/PrototypeAnimInstance.h"
+#include "ThirdPerson/PrototypeAIController.h"
+#include "ThirdPerson/PrototypeAttributeSet.h"
+#include "ThirdPerson/PrototypePlayerState.h"
 
 APrototypeCharacter::APrototypeCharacter()
 {
@@ -21,11 +27,23 @@ APrototypeCharacter::APrototypeCharacter()
 
     CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
     CameraComponent->AttachToComponent(SpringArmComponent, FAttachmentTransformRules::KeepRelativeTransform);
+
+    AIControllerClass = APrototypeAIController::StaticClass();
+    AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+
+    AttributeSet = CreateDefaultSubobject<UPrototypeAttributeSet>(TEXT("AttributeSet"));
 }
 
 void APrototypeCharacter::BeginPlay()
 {
     Super::BeginPlay();
+
+    UE_LOG(LogTemp, Warning, TEXT("%d"), AttributeSet->GetHealth());
+}
+
+void APrototypeCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
 
 void APrototypeCharacter::Tick(float DeltaTime)
@@ -33,6 +51,30 @@ void APrototypeCharacter::Tick(float DeltaTime)
     Super::Tick(DeltaTime);
     
     HitScanLineTrace();
+}
+
+void APrototypeCharacter::PossessedBy(AController* NewController)
+{
+    Super::PossessedBy(NewController);
+
+    TObjectPtr<APrototypePlayerState> PrototypePS = GetPlayerState<APrototypePlayerState>();
+    if (!IsValid(PrototypePS))
+    {
+        UE_LOG(LogTemp, Warning, TEXT("PossessedBy Failed: Player State is null"));
+        return;
+    }
+
+    auto PrototypeASC = Cast<UPrototypeAbilitySystemComponent>(PrototypePS->GetAbilitySystemComponent());
+    if(!IsValid(PrototypeASC))
+    {
+        UE_LOG(LogTemp, Warning, TEXT("PossessedBy Failed: AbilitySystemComponent is null"));
+        return;
+    }
+
+    PrototypeASC->InitAbilityActorInfo(PrototypePS, this);
+    // If we handle players disconnecting and rejoining in the future, we'll have to change this so that possession from rejoining doesn't reset attributes.
+    // For now assume possession = spawn/respawn.
+    InitializeAttributes();
 }
 
 void APrototypeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -65,6 +107,25 @@ void APrototypeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
     EnhancedInputComponent->BindAction(BasicFireAction, ETriggerEvent::Completed, this, &APrototypeCharacter::BasicFireStop);
     EnhancedInputComponent->BindAction(SkillAction, ETriggerEvent::Started, this, &APrototypeCharacter::SkillUseStart);
     EnhancedInputComponent->BindAction(SkillAction, ETriggerEvent::Completed, this, &APrototypeCharacter::SkillUseStop);
+}
+
+void APrototypeCharacter::InitializeAttributes()
+{
+    TObjectPtr<APrototypePlayerState> PrototypePS = GetPlayerState<APrototypePlayerState>();
+    if (!IsValid(PrototypePS))
+    {
+        UE_LOG(LogTemp, Warning, TEXT("InitializeAttributes Failed: Player State is null"));
+        return;
+    }
+
+    auto PrototypeASC = Cast<UPrototypeAbilitySystemComponent>(PrototypePS->GetAbilitySystemComponent());
+    if (!IsValid(PrototypeASC))
+    {
+        UE_LOG(LogTemp, Warning, TEXT("InitializeAttributes Failed: AbilitySystemComponent is null"));
+        return;
+    }
+
+    PrototypeASC
 }
 
 void APrototypeCharacter::Move(const FInputActionValue& Value)
@@ -132,10 +193,14 @@ void APrototypeCharacter::TryBasicFire()
 
 void APrototypeCharacter::BasicFire()
 {
+ 
+    HitScanLineTrace();
+    
+    // 타이머 다시 설정
     bBasicFireReady = false;
     GetWorldTimerManager().SetTimer(BasicFireTimerHandle, this, &APrototypeCharacter::BasicFireTimerFinished, BasicFireDelay);
-    UE_LOG(LogTemp, Warning, TEXT("Fire!!"));
 
+    // 애니메이션 몽타주 재생
     TObjectPtr<UAnimInstance> AnimInstance = GetMesh()->GetAnimInstance();
     if (AnimInstance && BasicFireAnimMontage)
     {
@@ -296,10 +361,6 @@ void APrototypeCharacter::HitScanLineTrace()
             UE_LOG(LogTemp, Warning, TEXT("Far Hit: %s"), *MuzzleLineTraceHitCharacter.GetFullName());
         }
     }
-}
-
-void APrototypeCharacter::LoadStatusFromTable()
-{
 }
 
 
