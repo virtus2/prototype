@@ -3,9 +3,10 @@
 
 #include "PrototypePlayerState.h"
 
+#include "Net/UnrealNetwork.h"
 #include "PrototypePlayerController.h"
 #include "PrototypeAbilitySystemComponent.h"
-#include "Net/UnrealNetwork.h"
+#include "PrototypeAttributeSet.h"
 
 APrototypePlayerState::APrototypePlayerState(const FObjectInitializer& ObjectInitializer)
 {
@@ -32,8 +33,6 @@ UAbilitySystemComponent* APrototypePlayerState::GetAbilitySystemComponent() cons
 void APrototypePlayerState::BeginPlay()
 {
     Super::BeginPlay();
-
-    UE_LOG(LogTemp, Warning, TEXT("PlayerState BeginPlay"));
 }
 
 void APrototypePlayerState::PreInitializeComponents()

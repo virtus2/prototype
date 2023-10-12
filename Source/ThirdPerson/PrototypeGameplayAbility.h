@@ -13,5 +13,19 @@ UCLASS()
 class THIRDPERSON_API UPrototypeGameplayAbility : public UGameplayAbility
 {
 	GENERATED_BODY()
-	
+	friend class UPrototypeAbilitySystemComponent;
+
+public:
+	UPrototypeGameplayAbility(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+
+protected:
+	// TODO: 바인딩할 UInputAction 추가?
+
+	// TODO: Booleans / Bitfields for core checks that we don't want to add tags to every ability for.
+	// Examples
+	// - Activate On Granted
+	// - Acitvate On Input
+	// - Can Activate Whilst Interacting
+	// - Cannot Activate Whilst Stunned
+	// - Cachec Owning Character
 };

@@ -17,15 +17,41 @@ class UPrototypeAbilitySystemComponent;
 class UPrototypeGameplayAbility;
 class UObject;
 
-UCLASS()
-class THIRDPERSON_API UPrototypeAbilitySet : public UPrimaryDataAsset
+USTRUCT(BlueprintType)
+struct FPrototypeAbilitySet_GrantedHandles
 {
 	GENERATED_BODY()
 
 public:
+	void AddAbilitySpecHandle(const FGameplayAbilitySpecHandle& Handle);
+	void AddGameplayEffectHandle(const FActiveGameplayEffectHandle& Handle);
+	void AddAttributeSet(UAttributeSet* Set);
+
+	void TakeFromAbilitySystem(UPrototypeAbilitySystemComponent* PrototypeASC);
+
+protected:
+	// Handles to the granted abilities.
+	UPROPERTY()
+	TArray<FGameplayAbilitySpecHandle> AbilitySpecHandles;
+
+	// Handles to the granted gameplay effects.
+	UPROPERTY()
+	TArray<FActiveGameplayEffectHandle> GameplayEffectHandles;
+
+	// Pointers to the granted attribute sets
+	UPROPERTY()
+	TArray<TObjectPtr<UAttributeSet>> GrantedAttributeSets;
+};
+
+UCLASS()
+class THIRDPERSON_API UPrototypeAbilitySet : public UPrimaryDataAsset
+{
+	GENERATED_BODY()
+	
+public:
 	UPrototypeAbilitySet(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-	void GiveToAbilitySystem(UPrototypeAbilitySystemComponent* PrototypeASC);
+	void GiveToAbilitySystem(UPrototypeAbilitySystemComponent* PrototypeASC, FPrototypeAbilitySet_GrantedHandles* OutGrantedHandles, UObject* SourceObject);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Gameplay Abilities", meta = (TitleProperty = Ability))

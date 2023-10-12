@@ -11,6 +11,7 @@ class AController;
 class APrototypePlayerController;
 class UAbilitySystemComponent;
 class UPrototypeAbilitySystemComponent;
+class UPrototypeAttributeSet;
 
 UCLASS()
 class THIRDPERSON_API APrototypePlayerState : public APlayerState, public IAbilitySystemInterface
@@ -39,6 +40,8 @@ public:
 	virtual void OnReactivated();
 	// ~End of APlayerState interface
 
+
+
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 
@@ -53,6 +56,7 @@ private:
 	 * 액터가 소멸되어 리스폰될 수 있는 경우에는 어빌리티 시스템 컴포넌트를 플레이어 스테이트에 보관하는 것이 좋다. 
 	 * 다수의 액터가 하나의 어빌리티 시스템 컴포넌트를 공유할 수 있다.
 	 */
-	UPROPERTY(VisibleAnywhere, Category = "Prototype|PlayerState")
+	UPROPERTY()
 	TObjectPtr<UPrototypeAbilitySystemComponent> AbilitySystemComponent;
+
 };

@@ -36,14 +36,21 @@ class THIRDPERSON_API UPrototypeAttributeSet : public UAttributeSet
 	GENERATED_BODY()
 
 public:
-	UPrototypeAttributeSet();
+	UPrototypeAttributeSet(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
+	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
 
 	ATTRIBUTE_ACCESSORS(UPrototypeAttributeSet, Health);
 	ATTRIBUTE_ACCESSORS(UPrototypeAttributeSet, MaxHealth);
 
 protected:
+	// Helper function to proportionally adjust the value of an attribute when it's associated max attribute changes.
+	// (i.e. When MaxHealth increases, Health increases by an amount that maintains the same percentage as before)
+	void AdjustAttributeForMaxChange(FGameplayAttributeData& AffectedAttribute, const FGameplayAttributeData& MaxAttribute, float NewMaxValue, const FGameplayAttribute& AffectedAttributeProperty);
+
 	UFUNCTION()
 	void OnRep_Health(const FGameplayAttributeData& OldValue);
 

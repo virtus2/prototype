@@ -14,8 +14,10 @@ class UAnimMontage;
 class UPrototypeAnimInstance;
 class UPrototypeAttributeSet;
 class UGameplayEffect;
+class UPrototypeAbilitySet;
 struct FInputActionValue;
 struct FTimerHandle;
+struct FOnAttributeChangeData;
 
 USTRUCT(BlueprintType)
 struct FPrototypeCharacterStatus : public FTableRowBase
@@ -104,6 +106,7 @@ protected:
 
     void HitScanLineTrace();
 
+    void HandleHealthChanged(const FOnAttributeChangeData& Data);
 
 private:
 
@@ -117,61 +120,61 @@ protected:
     UPROPERTY(EditAnywhere)
     TObjectPtr<UCameraComponent> CameraComponent;
 
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, Category="Prototype Character|Animation")
     TObjectPtr<UAnimMontage> BasicFireAnimMontage;
 
     /*
         Enhanced Input...
     */
-    UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
+    UPROPERTY(EditDefaultsOnly, Category = "Prototype Character|Enhanced Input")
     TObjectPtr<UInputMappingContext> InputMapping;
 
-    UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
+    UPROPERTY(EditDefaultsOnly, Category = "Prototype Character|Enhanced Input")
     TObjectPtr<UInputAction> MoveAction;
 
-    UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
+    UPROPERTY(EditDefaultsOnly, Category = "Prototype Character|Enhanced Input")
     TObjectPtr<UInputAction> LookAction;
 
-    UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
+    UPROPERTY(EditDefaultsOnly, Category = "Prototype Character|Enhanced Input")
     TObjectPtr<UInputAction> JumpAction;
 
-    UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
+    UPROPERTY(EditDefaultsOnly, Category = "Prototype Character|Enhanced Input")
     TObjectPtr<UInputAction> BasicFireAction;
 
-    UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
+    UPROPERTY(EditDefaultsOnly, Category = "Prototype Character|Enhanced Input")
     TObjectPtr<UInputAction> SkillAction;
 
-    UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
+    UPROPERTY(EditDefaultsOnly, Category = "Prototype Character|Enhanced Input")
     TObjectPtr<UInputAction> SpecialMoveRAction;
 
-    UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
+    UPROPERTY(EditDefaultsOnly, Category = "Prototype Character|Enhanced Input")
     TObjectPtr<UInputAction> SpecialMoveEAction;
 
-    UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
+    UPROPERTY(EditDefaultsOnly, Category = "Prototype Character|Enhanced Input")
     TObjectPtr<UInputAction> SpecialMoveQAction;
 
     /*
         Character Status... 
     */
-    UPROPERTY(EditDefaultsOnly, Category = "Character Status")
+    UPROPERTY(EditDefaultsOnly, Category = "Prototype Character|Character Status")
     FPrototypeCharacterStatus CharacterStatus;
 
-    UPROPERTY(EditDefaultsOnly, Category ="Character Status")
+    UPROPERTY(EditDefaultsOnly, Category ="Prototype Character|Character Status")
     float CurrentHealthPoint;
 
-    UPROPERTY(VisibleAnywhere, Category = "Character Status|Combat")
+    UPROPERTY(VisibleAnywhere, Category = "Prototype Character|Character Status|Combat")
     bool bSaveAttack;
 
-    UPROPERTY(VisibleAnywhere, Category = "Character Status|Combat")
+    UPROPERTY(VisibleAnywhere, Category = "Prototype Character|Character Status|Combat")
     bool bResetCombo;
 
-    UPROPERTY(VisibleAnywhere, Category="Character Status|Combat")
+    UPROPERTY(VisibleAnywhere, Category="Prototype Character|Character Status|Combat")
     bool bBasicFireStarted;
 
-    UPROPERTY(VisibleAnywhere, Category = "Character Status|Combat")
+    UPROPERTY(VisibleAnywhere, Category = "Prototype Character|Character Status|Combat")
     bool bBasicFireReady = true;
     
-    UPROPERTY(EditDefaultsOnly, Category = "Character Status|Combat")
+    UPROPERTY(EditDefaultsOnly, Category = "Prototype Character|Character Status|Combat")
     float BasicFireDelay;
 
     FTimerHandle BasicFireTimerHandle;
@@ -182,13 +185,20 @@ protected:
     /*
      * 어빌리티 시스템 테스트
      */
-    UPROPERTY()
-    TObjectPtr<UPrototypeAttributeSet> AttributeSet;
 
     // Default attributes for a character for initializing on spawn/respawn.
     // This is an instant GE that overrides the values for attributes that get reset on spawn/respawn.
-    UPROPERTY(BlueprintReadOnly, EditAnywhere)
+    UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Prototype Character|Ability")
     TSubclassOf<UGameplayEffect> DefaultAttributes;
+
+    UPROPERTY(EditDefaultsOnly, Category = "Prototype Character|Ability")
+    TSubclassOf<UPrototypeAttributeSet> AttributeSetClass;
+
+    UPROPERTY()
+    UPrototypeAttributeSet* AttributeSet;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Prototype Character|Ability")
+    TArray<TObjectPtr<UPrototypeAbilitySet>> AbilitySets;
 
 
 private:

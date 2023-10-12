@@ -3,3 +3,7 @@
 
 #include "PrototypeGameplayAbility.h"
 
+UPrototypeGameplayAbility::UPrototypeGameplayAbility(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+{
+
+}

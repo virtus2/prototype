@@ -16,6 +16,7 @@
 #include "ThirdPerson/PrototypeAIController.h"
 #include "ThirdPerson/PrototypeAttributeSet.h"
 #include "ThirdPerson/PrototypePlayerState.h"
+#include "ThirdPerson/PrototypeAbilitySet.h"
 
 APrototypeCharacter::APrototypeCharacter()
 {
@@ -38,7 +39,13 @@ void APrototypeCharacter::BeginPlay()
 {
     Super::BeginPlay();
 
-    UE_LOG(LogTemp, Warning, TEXT("%d"), AttributeSet->GetHealth());
+    UE_LOG(LogTemp, Warning, TEXT("BeginPlay"));
+    // TODO: Listen for Attribute Changes
+    // 1. Listen for Attribute Changes
+
+    // 2. Bind to ASC->OnImmunityBlockGameplayEffectDelegate
+
+    
 }
 
 void APrototypeCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -71,10 +78,19 @@ void APrototypeCharacter::PossessedBy(AController* NewController)
         return;
     }
 
+    // TODO: Initialize Attributes
+    // https://youtu.be/vknzNVYJjr4?si=ZASeLDMeJiZV2d81&t=947
+    // 1. AbilitySystemComponent->InitAbilityActorInfo
     PrototypeASC->InitAbilityActorInfo(PrototypePS, this);
+    // AttributeSet = PrototypePS->GetAttributeSetBase();
+    // 2. Initialize Attributes.
     // If we handle players disconnecting and rejoining in the future, we'll have to change this so that possession from rejoining doesn't reset attributes.
     // For now assume possession = spawn/respawn.
     InitializeAttributes();
+    // 3. Listen for tags of interest(via UAsyncTaskGameplayTagAddedRemoved).
+    // 4. Add start-up effects.
+    // 5. Bind to Ability Activation Failed Callback.
+    UE_LOG(LogTemp, Warning, TEXT("PossessedBy Success!"));
 }
 
 void APrototypeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -118,14 +134,38 @@ void APrototypeCharacter::InitializeAttributes()
         return;
     }
 
-    auto PrototypeASC = Cast<UPrototypeAbilitySystemComponent>(PrototypePS->GetAbilitySystemComponent());
+    auto ASC = PrototypePS->GetAbilitySystemComponent();
+    auto PrototypeASC = Cast<UPrototypeAbilitySystemComponent>(ASC);
     if (!IsValid(PrototypeASC))
     {
         UE_LOG(LogTemp, Warning, TEXT("InitializeAttributes Failed: AbilitySystemComponent is null"));
         return;
     }
 
-    PrototypeASC
+    AttributeSet = NewObject<UPrototypeAttributeSet>(ASC->GetOwner(), AttributeSetClass.Get());
+    PrototypeASC->AddAttributeSetSubobject(AttributeSet);
+
+    
+    for (int i = 0; i < AbilitySets.Num(); i++)
+    {
+        FPrototypeAbilitySet_GrantedHandles Handle;
+        AbilitySets[i]->GiveToAbilitySystem(PrototypeASC, /* out */ &Handle, this);
+    }
+
+    /*
+    FGameplayEffectContextHandle EffectContext = PrototypeASC->MakeEffectContext();
+    EffectContext.AddSourceObject(this);
+
+    FGameplayEffectSpecHandle EffectHandle = PrototypeASC->MakeOutgoingSpec(DefaultAttributes, 0, EffectContext);
+    if (EffectHandle.IsValid())
+    {
+        FActiveGameplayEffectHandle ActiveGEHandle = PrototypeASC->ApplyGameplayEffectSpecToTarget(*EffectHandle.Data.Get(), PrototypeASC);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("EffectHandle is not valid"));
+    }
+    */
 }
 
 void APrototypeCharacter::Move(const FInputActionValue& Value)
@@ -206,6 +246,7 @@ void APrototypeCharacter::BasicFire()
     {
         AnimInstance->Montage_Play(BasicFireAnimMontage, 1.0f / BasicFireDelay);
     }
+
 }
 
 void APrototypeCharacter::BasicFireTimerFinished()
@@ -361,6 +402,11 @@ void APrototypeCharacter::HitScanLineTrace()
             UE_LOG(LogTemp, Warning, TEXT("Far Hit: %s"), *MuzzleLineTraceHitCharacter.GetFullName());
         }
     }
+}
+
+void APrototypeCharacter::HandleHealthChanged(const FOnAttributeChangeData& Data)
+{
+    UE_LOG(LogTemp, Warning, TEXT("Health Changed %d -> %d"), Data.OldValue, Data.NewValue);
 }
 
 
