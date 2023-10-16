@@ -19,44 +19,6 @@ struct FInputActionValue;
 struct FTimerHandle;
 struct FOnAttributeChangeData;
 
-USTRUCT(BlueprintType)
-struct FPrototypeCharacterStatus : public FTableRowBase
-{
-    GENERATED_USTRUCT_BODY()
-
-public:
-    FPrototypeCharacterStatus()
-        : MaxHealthPoint(1000.0f)
-        , AttackSpeed(1.0f)
-        , CharacterIcon()
-    {}
-
-public:
-    /** 캐릭터의 최대 체력 */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    float MaxHealthPoint;
-
-    /** 캐릭터의 공격 속도 */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    float AttackSpeed;
-
-    /** 캐릭터의 아이콘 */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TSoftObjectPtr<UTexture> CharacterIcon;
-
-    /** 캐릭터의 스켈레탈 메쉬 */
-    UPROPERTY(EditAnywhere, BlueprintReadOnly)
-    TSoftObjectPtr<USkeletalMesh> CharacterMesh;
-
-    /** 캐릭터의 애니메이션 블루프린트 */
-    UPROPERTY(EditAnywhere, BlueprintReadOnly)
-    TSubclassOf<UPrototypeAnimInstance> AnimInstance;
-
-    /** 캐릭터의 기본 공격 몽타주 */
-    UPROPERTY(EditAnywhere, BlueprintReadOnly)
-    TSoftObjectPtr<UAnimMontage> BasicFireAnimMontage;
-};
-
 UCLASS()
 class THIRDPERSON_API APrototypeCharacter : public ACharacter
 {
@@ -156,12 +118,6 @@ protected:
     /*
         Character Status... 
     */
-    UPROPERTY(EditDefaultsOnly, Category = "Prototype Character|Character Status")
-    FPrototypeCharacterStatus CharacterStatus;
-
-    UPROPERTY(EditDefaultsOnly, Category ="Prototype Character|Character Status")
-    float CurrentHealthPoint;
-
     UPROPERTY(VisibleAnywhere, Category = "Prototype Character|Character Status|Combat")
     bool bSaveAttack;
 
@@ -181,24 +137,6 @@ protected:
 
     int AttackCount;
 
-
-    /*
-     * 어빌리티 시스템 테스트
-     */
-
-    // Default attributes for a character for initializing on spawn/respawn.
-    // This is an instant GE that overrides the values for attributes that get reset on spawn/respawn.
-    UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Prototype Character|Ability")
-    TSubclassOf<UGameplayEffect> DefaultAttributes;
-
-    UPROPERTY(EditDefaultsOnly, Category = "Prototype Character|Ability")
-    TSubclassOf<UPrototypeAttributeSet> AttributeSetClass;
-
-    UPROPERTY()
-    UPrototypeAttributeSet* AttributeSet;
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Prototype Character|Ability")
-    TArray<TObjectPtr<UPrototypeAbilitySet>> AbilitySets;
 
 
 private:

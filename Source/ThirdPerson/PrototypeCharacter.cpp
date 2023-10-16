@@ -31,8 +31,6 @@ APrototypeCharacter::APrototypeCharacter()
 
     AIControllerClass = APrototypeAIController::StaticClass();
     AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
-
-    AttributeSet = CreateDefaultSubobject<UPrototypeAttributeSet>(TEXT("AttributeSet"));
 }
 
 void APrototypeCharacter::BeginPlay()
@@ -86,7 +84,7 @@ void APrototypeCharacter::PossessedBy(AController* NewController)
     // 2. Initialize Attributes.
     // If we handle players disconnecting and rejoining in the future, we'll have to change this so that possession from rejoining doesn't reset attributes.
     // For now assume possession = spawn/respawn.
-    InitializeAttributes();
+    // InitializeAttributes();
     // 3. Listen for tags of interest(via UAsyncTaskGameplayTagAddedRemoved).
     // 4. Add start-up effects.
     // 5. Bind to Ability Activation Failed Callback.
@@ -127,6 +125,7 @@ void APrototypeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 
 void APrototypeCharacter::InitializeAttributes()
 {
+    /*
     TObjectPtr<APrototypePlayerState> PrototypePS = GetPlayerState<APrototypePlayerState>();
     if (!IsValid(PrototypePS))
     {
@@ -142,28 +141,13 @@ void APrototypeCharacter::InitializeAttributes()
         return;
     }
 
-    AttributeSet = NewObject<UPrototypeAttributeSet>(ASC->GetOwner(), AttributeSetClass.Get());
-    PrototypeASC->AddAttributeSetSubobject(AttributeSet);
-
-    
-    for (int i = 0; i < AbilitySets.Num(); i++)
-    {
-        FPrototypeAbilitySet_GrantedHandles Handle;
-        AbilitySets[i]->GiveToAbilitySystem(PrototypeASC, /* out */ &Handle, this);
-    }
-
-    /*
     FGameplayEffectContextHandle EffectContext = PrototypeASC->MakeEffectContext();
     EffectContext.AddSourceObject(this);
 
-    FGameplayEffectSpecHandle EffectHandle = PrototypeASC->MakeOutgoingSpec(DefaultAttributes, 0, EffectContext);
-    if (EffectHandle.IsValid())
+    FGameplayEffectSpecHandle NewHandle = PrototypeASC->MakeOutgoingSpec(DefaultAttributes, 0, EffectContext);
+    if (NewHandle.IsValid())
     {
-        FActiveGameplayEffectHandle ActiveGEHandle = PrototypeASC->ApplyGameplayEffectSpecToTarget(*EffectHandle.Data.Get(), PrototypeASC);
-    }
-    else
-    {
-        UE_LOG(LogTemp, Warning, TEXT("EffectHandle is not valid"));
+        FActiveGameplayEffectHandle ActiveGEHandle = PrototypeASC->ApplyGameplayEffectSpecToTarget(*NewHandle.Data.Get(), PrototypeASC);
     }
     */
 }

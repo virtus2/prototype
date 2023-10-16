@@ -50,6 +50,8 @@ private:
 public:
 
 protected:
+	UPROPERTY()
+	UPrototypeAttributeSet* AttributeSetBase;
 
 private:
 	/**

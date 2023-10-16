@@ -14,6 +14,8 @@ APrototypePlayerState::APrototypePlayerState(const FObjectInitializer& ObjectIni
     AbilitySystemComponent->SetIsReplicated(true);
     AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 
+    AttributeSetBase = CreateDefaultSubobject<UPrototypeAttributeSet>(TEXT("AttributeSetBase"));
+
     // PlayerState의 NetUpdateFrequency 기본 값은 매우 낮기 때문에, 어빌리티 시스템에 렉을 유발할 수 있다.
     // 따라서 캐릭터의 값인 100과 같게 조정해준다. 하지만 1초에 100번 업데이트는 상용 게임에서 다소 높은 값일 수 있다.
     // 나중에 적당히 수정해주면 된다.
