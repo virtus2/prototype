@@ -10,6 +10,8 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
+#include "PrototypePlayerState.h"
+#include "PrototypeAttributeSet.h"
 #include "PrototypeAbilitySystemComponent.h"
 
 APTHeroCharacter::APTHeroCharacter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -72,6 +74,34 @@ void APTHeroCharacter::PossessedBy(AController* NewController)
 {
     Super::PossessedBy(NewController);
 
+    TObjectPtr<APrototypePlayerState> PS = GetPlayerState<APrototypePlayerState>();
+    if (!IsValid(PS))
+    {
+        return;
+    }
+
+    AbilitySystemComponent = Cast<UPrototypeAbilitySystemComponent>(PS->GetAbilitySystemComponent());
+    AbilitySystemComponent->InitAbilityActorInfo(PS, this);
+    AttributeSetBase = PS->GetAttributeSetBase();
+    InitializeAttributes();
+
+
+}
+
+void APTHeroCharacter::OnRep_PlayerState()
+{
+    Super::OnRep_PlayerState();
+
+    TObjectPtr<APrototypePlayerState> PS = GetPlayerState<APrototypePlayerState>();
+    if (!IsValid(PS))
+    {
+        return;
+    }
+
+    AbilitySystemComponent = Cast<UPrototypeAbilitySystemComponent>(PS->GetAbilitySystemComponent());
+    AbilitySystemComponent->InitAbilityActorInfo(PS, this);
+    AttributeSetBase = PS->GetAttributeSetBase();
+    InitializeAttributes();
 }
 
 void APTHeroCharacter::Move(const FInputActionValue& Value)

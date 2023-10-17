@@ -32,6 +32,11 @@ UAbilitySystemComponent* APrototypePlayerState::GetAbilitySystemComponent() cons
     return GetPrototypeAbilitySystemComponent();
 }
 
+UPrototypeAttributeSet* APrototypePlayerState::GetAttributeSetBase() const
+{
+    return AttributeSetBase;
+}
+
 void APrototypePlayerState::BeginPlay()
 {
     Super::BeginPlay();

@@ -28,6 +28,9 @@ protected:
 	// Only called on the Server. Calls before Server's AcknowledgePossession.
 	virtual void PossessedBy(AController* NewController) override;
 
+    // Client only
+    virtual void OnRep_PlayerState() override;
+
     virtual void Move(const FInputActionValue& Value);
     virtual void Look(const FInputActionValue& Value);
     virtual void JumpStart(const FInputActionValue& Value);
