@@ -5,6 +5,7 @@
 
 #include "Components/CapsuleComponent.h"
 
+#include "PrototypeAttributeSet.h"
 #include "PrototypeGameplayAbility.h"
 #include "PrototypeAbilitySystemComponent.h"
 
@@ -21,6 +22,24 @@ APTCharacterBase::APTCharacterBase(const FObjectInitializer& ObjectInitializer) 
 	bAlwaysRelevant = true;
 }
 
+float APTCharacterBase::GetHealth() const
+{
+	if (AttributeSetBase.IsValid())
+	{
+		return AttributeSetBase->GetHealth();
+	}
+	return 0.0f;
+}
+
+float APTCharacterBase::GetMaxHealth() const
+{
+	if (AttributeSetBase.IsValid())
+	{
+		return AttributeSetBase->GetMaxHealth();
+	}
+	return 0.0f;
+}
+
 // Called when the game starts or when spawned
 void APTCharacterBase::BeginPlay()
 {
@@ -32,13 +51,6 @@ void APTCharacterBase::BeginPlay()
 void APTCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-}
-
-// Called to bind functionality to input
-void APTCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 }
 
@@ -88,3 +100,10 @@ void APTCharacterBase::AddStartupEffects()
 {
 }
 
+void APTCharacterBase::SetHealth(float Health)
+{
+	if (AttributeSetBase.IsValid())
+	{
+		AttributeSetBase->SetHealth(Health);
+	}
+}

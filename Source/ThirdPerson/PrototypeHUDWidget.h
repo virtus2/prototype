@@ -15,25 +15,29 @@ class THIRDPERSON_API UPrototypeHUDWidget : public UUserWidget
     GENERATED_BODY()
 
 public:
-    UFUNCTION(BlueprintCallable)
-    void UpdateHealth(float CurrentHealthPoint, float MaxHealthPoint);
+    UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+    void SetMaxHealth(float InMaxHealth);
+
+    UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+    void SetCurrentHealth(float InCurrentHealth);
+
+    UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+    void SetHealthPercentage(float InHealthPercentage);
 
 protected:
 
 private:
-
 
 public:
 
-
 protected:
-    UPROPERTY(EditAnywhere, meta=(BindWidget))
-    TObjectPtr<UTextBlock> HealthPointTextBlock;
+    UPROPERTY(BlueprintReadWrite)
+    float MaxHealth;
 
-    UPROPERTY(EditAnywhere, meta=(BindWidget))
-    TObjectPtr<UProgressBar> HealthPointProgressBar;
+    UPROPERTY(BlueprintReadWrite)
+    float CurrentHealth;
 
-private:
+    UPROPERTY(BlueprintReadWrite)
+    float HealthPercentage;
 
-    
 };

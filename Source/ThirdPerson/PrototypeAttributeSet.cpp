@@ -22,26 +22,35 @@ void UPrototypeAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty
 void UPrototypeAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
 {
 	Super::PreAttributeChange(Attribute, NewValue);
-	UE_LOG(LogTemp, Warning, TEXT("PreAttributeChange"));
 	
+	// TODO: 체력을 최대체력으로 맞춰주는거는 필요없을수도 있음
 	if (Attribute == GetMaxHealthAttribute())
 	{
-		AdjustAttributeForMaxChange(Health, MaxHealth, NewValue, GetHealthAttribute());
+		UE_LOG(LogTemp, Warning, TEXT("PreAttributeChange MaxHealth - NewValue: %f"), NewValue);
+		// AdjustAttributeForMaxChange(Health, MaxHealth, NewValue, GetHealthAttribute());
+	}
+	else if (Attribute == GetHealthAttribute())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PreAttributeChange Health - NewValue: %f"), NewValue);
 	}
 }
 
 void UPrototypeAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
 {
 	Super::PostGameplayEffectExecute(Data);
-	UE_LOG(LogTemp, Warning, TEXT("PostGameplayEffectExecute"));
 
-	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
+	if (Data.EvaluatedData.Attribute == GetMaxHealthAttribute())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PostGameplayEffectExecute MaxHealth"));
+
+	}
+	else if (Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
 		// 이 게임플레이 이펙트는 Health를 변경합니다. 적용하되 우선 값을 제한합니다.
 		// 이 경우 Health 베이스 값은 음수가 아니어야 합니다.
+		UE_LOG(LogTemp, Warning, TEXT("PostGameplayEffectExecute Health"));
 		SetHealth(FMath::Max(GetHealth(), 0.0f));
 	}
-
 }
 
 void UPrototypeAttributeSet::AdjustAttributeForMaxChange(FGameplayAttributeData& AffectedAttribute, const FGameplayAttributeData& MaxAttribute, float NewMaxValue, const FGameplayAttribute& AffectedAttributeProperty)
@@ -60,8 +69,10 @@ void UPrototypeAttributeSet::AdjustAttributeForMaxChange(FGameplayAttributeData&
 
 void UPrototypeAttributeSet::OnRep_Health(const FGameplayAttributeData& OldValue)
 {
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UPrototypeAttributeSet, Health, OldValue);
 }
 
 void UPrototypeAttributeSet::OnRep_MaxHealth(const FGameplayAttributeData& OldValue)
 {
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UPrototypeAttributeSet, MaxHealth, OldValue);
 }

@@ -20,17 +20,21 @@ public:
 	// Sets default values for this character's properties
 	APTCharacterBase(const class FObjectInitializer& ObjectInitializer);
 
+	UFUNCTION(BlueprintCallable, Category = "Prototype Character|Abilities")
+	float GetHealth() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Prototype Character|Abilities")
+	float GetMaxHealth() const;
+
+
+
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
 
 	// Grant abilities on the Server. The Ability Specs will be replicated to the owning client.
 	virtual void AddCharacterAbilities();
@@ -41,6 +45,11 @@ public:
 	virtual void InitializeAttributes();
 
 	virtual void AddStartupEffects();
+
+	
+	virtual void SetHealth(float Health);
+
+private:
 
 public:
 

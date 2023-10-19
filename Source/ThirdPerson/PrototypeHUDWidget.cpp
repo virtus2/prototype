@@ -5,12 +5,3 @@
 
 #include <Components/TextBlock.h>
 #include <Components/ProgressBar.h>
-
-
-void UPrototypeHUDWidget::UpdateHealth(float CurrentHealthPoint, float MaxHealthPoint)
-{
-    float percent = CurrentHealthPoint / (MaxHealthPoint + 0.00001f); 
-    HealthPointProgressBar->SetPercent(percent);
-    
-    HealthPointTextBlock->SetText(FText::AsNumber(CurrentHealthPoint));
-}

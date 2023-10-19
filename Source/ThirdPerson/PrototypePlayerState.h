@@ -12,6 +12,8 @@ class APrototypePlayerController;
 class UAbilitySystemComponent;
 class UPrototypeAbilitySystemComponent;
 class UPrototypeAttributeSet;
+class FDelegateHandle;
+struct FOnAttributeChangeData;
 
 UCLASS()
 class THIRDPERSON_API APrototypePlayerState : public APlayerState, public IAbilitySystemInterface
@@ -31,22 +33,33 @@ public:
 	
 	UPrototypeAttributeSet* GetAttributeSetBase() const;
 
+	UFUNCTION(BlueprintCallable, Category = "GASDocumentation|GDPlayerState|Attributes")
+	float GetHealth() const;
+
+	UFUNCTION(BlueprintCallable, Category = "GASDocumentation|GDPlayerState|Attributes")
+	float GetMaxHealth() const;
+
+
+protected:
+	FDelegateHandle HealthChangedDelegateHandle;
+	FDelegateHandle MaxHealthChangedDelegateHandle;
+
+	virtual void HealthChanged(const FOnAttributeChangeData& Data);
+	virtual void MaxHealthChanged(const FOnAttributeChangeData& Data);
+
+
+
 	//~AActor interface
 	virtual void BeginPlay() override;
 	virtual void PreInitializeComponents() override;
 	virtual void PostInitializeComponents() override;
 	//~End of AActor interface
-	
+
 	// ~APlayerState interface
 	virtual void ClientInitialize(AController* C) override;
 	virtual void OnDeactivated();
 	virtual void OnReactivated();
 	// ~End of APlayerState interface
-
-
-
-protected:
-	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 
 private:
 

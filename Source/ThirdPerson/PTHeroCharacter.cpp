@@ -12,6 +12,7 @@
 
 #include "PrototypePlayerState.h"
 #include "PrototypeAttributeSet.h"
+#include "PrototypePlayerController.h"
 #include "PrototypeAbilitySystemComponent.h"
 
 APTHeroCharacter::APTHeroCharacter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -67,7 +68,6 @@ void APTHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
             FGameplayAbilityInputBinds(FString("ConfirmTarget"), FString("CancelTarget"), 
         */
     }
-    
 }
 
 void APTHeroCharacter::PossessedBy(AController* NewController)
@@ -85,6 +85,14 @@ void APTHeroCharacter::PossessedBy(AController* NewController)
     AttributeSetBase = PS->GetAttributeSetBase();
     InitializeAttributes();
 
+    SetHealth(GetMaxHealth());
+
+    TObjectPtr<APrototypePlayerController> PC = Cast<APrototypePlayerController>(GetController());
+    if (!IsValid(PC))
+    {
+        return;
+    }
+    PC->CreateHUD();
 
 }
 
@@ -102,6 +110,15 @@ void APTHeroCharacter::OnRep_PlayerState()
     AbilitySystemComponent->InitAbilityActorInfo(PS, this);
     AttributeSetBase = PS->GetAttributeSetBase();
     InitializeAttributes();
+
+    SetHealth(GetMaxHealth());
+
+    TObjectPtr<APrototypePlayerController> PC = Cast<APrototypePlayerController>(GetController());
+    if (!IsValid(PC))
+    {
+        return;
+    }
+    PC->CreateHUD();
 }
 
 void APTHeroCharacter::Move(const FInputActionValue& Value)

@@ -4,6 +4,8 @@
 #include "PrototypePlayerState.h"
 
 #include "Net/UnrealNetwork.h"
+
+#include "PTHeroCharacter.h"
 #include "PrototypePlayerController.h"
 #include "PrototypeAbilitySystemComponent.h"
 #include "PrototypeAttributeSet.h"
@@ -37,9 +39,52 @@ UPrototypeAttributeSet* APrototypePlayerState::GetAttributeSetBase() const
     return AttributeSetBase;
 }
 
+float APrototypePlayerState::GetHealth() const
+{
+    return AttributeSetBase->GetHealth();
+}
+
+float APrototypePlayerState::GetMaxHealth() const
+{
+    return AttributeSetBase->GetMaxHealth();
+}
+
+void APrototypePlayerState::HealthChanged(const FOnAttributeChangeData& Data)
+{
+    float Health = Data.NewValue;
+
+    TObjectPtr<APTHeroCharacter> HeroCharacter = Cast<APTHeroCharacter>(GetPawn());
+    if (!IsValid(HeroCharacter))
+    {
+        return;
+    }
+
+    // TODO: Update the HUD
+    UE_LOG(LogTemp, Warning, TEXT("HealthChanged - NewValue: %f, OldValue: %f"), Data.NewValue, Data.OldValue);
+}
+
+void APrototypePlayerState::MaxHealthChanged(const FOnAttributeChangeData& Data)
+{
+    float MaxHealth = Data.NewValue;
+
+    TObjectPtr<APTHeroCharacter> HeroCharacter = Cast<APTHeroCharacter>(GetPawn());
+    if (!IsValid(HeroCharacter))
+    {
+        return;
+    }
+
+    // TODO: Update the HUD
+    UE_LOG(LogTemp, Warning, TEXT("MaxHealthChanged - NewValue: %f, OldValue: %f"), Data.NewValue, Data.OldValue);
+}
+
 void APrototypePlayerState::BeginPlay()
 {
     Super::BeginPlay();
+
+    if (AbilitySystemComponent)
+    {
+        HealthChangedDelegateHandle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSetBase->GetHealthAttribute()).AddUObject(this, &APrototypePlayerState::HealthChanged);
+    }
 }
 
 void APrototypePlayerState::PreInitializeComponents()
@@ -65,9 +110,4 @@ void APrototypePlayerState::OnDeactivated()
 void APrototypePlayerState::OnReactivated()
 {
     Super::OnReactivated();
-}
-
-void APrototypePlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
