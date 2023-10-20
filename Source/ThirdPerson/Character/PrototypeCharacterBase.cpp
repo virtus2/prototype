@@ -1,17 +1,17 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "PTCharacterBase.h"
+#include "PrototypeCharacterBase.h"
 
 #include "Components/CapsuleComponent.h"
 
-#include "PrototypeAttributeSet.h"
-#include "PrototypeGameplayAbility.h"
-#include "PrototypeAbilitySystemComponent.h"
+#include "ThirdPerson/Abilities/PrototypeAttributeSet.h"
+#include "ThirdPerson/Abilities/PrototypeGameplayAbility.h"
+#include "ThirdPerson/Abilities/PrototypeAbilitySystemComponent.h"
 
 
 // Sets default values
-APTCharacterBase::APTCharacterBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+APrototypeCharacterBase::APrototypeCharacterBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
@@ -22,7 +22,7 @@ APTCharacterBase::APTCharacterBase(const FObjectInitializer& ObjectInitializer) 
 	bAlwaysRelevant = true;
 }
 
-float APTCharacterBase::GetHealth() const
+float APrototypeCharacterBase::GetHealth() const
 {
 	if (AttributeSetBase.IsValid())
 	{
@@ -31,7 +31,7 @@ float APTCharacterBase::GetHealth() const
 	return 0.0f;
 }
 
-float APTCharacterBase::GetMaxHealth() const
+float APrototypeCharacterBase::GetMaxHealth() const
 {
 	if (AttributeSetBase.IsValid())
 	{
@@ -40,21 +40,43 @@ float APTCharacterBase::GetMaxHealth() const
 	return 0.0f;
 }
 
+float APrototypeCharacterBase::GetMana() const
+{
+	if (AttributeSetBase.IsValid())
+	{
+		return AttributeSetBase->GetMana();
+	}
+	return 0.0f;
+}
+
+float APrototypeCharacterBase::GetMaxMana() const
+{
+	if (AttributeSetBase.IsValid())
+	{
+		return AttributeSetBase->GetMaxMana();
+	}
+	return 0.0f;
+}
+
 // Called when the game starts or when spawned
-void APTCharacterBase::BeginPlay()
+void APrototypeCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
 }
 
 // Called every frame
-void APTCharacterBase::Tick(float DeltaTime)
+void APrototypeCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 }
 
-void APTCharacterBase::AddCharacterAbilities()
+void APrototypeCharacterBase::InitAbilityActorInfo()
+{
+}
+
+void APrototypeCharacterBase::AddCharacterAbilities()
 {
 	// Grant abilities, but only on the server	
 	if (GetLocalRole() != ROLE_Authority || !AbilitySystemComponent.IsValid() /* || AbilitySystemComponent->bCharacterAbilitiesGiven*/)
@@ -72,7 +94,7 @@ void APTCharacterBase::AddCharacterAbilities()
 	// AbilitySystemComponent->bCharacterAbilitiesGiven = true;
 }
 
-void APTCharacterBase::InitializeAttributes()
+void APrototypeCharacterBase::InitializeAttributes()
 {
 	if (!AbilitySystemComponent.IsValid())
 	{
@@ -96,14 +118,22 @@ void APTCharacterBase::InitializeAttributes()
 	}
 }
 
-void APTCharacterBase::AddStartupEffects()
+void APrototypeCharacterBase::AddStartupEffects()
 {
 }
 
-void APTCharacterBase::SetHealth(float Health)
+void APrototypeCharacterBase::SetHealth(float Health)
 {
 	if (AttributeSetBase.IsValid())
 	{
 		AttributeSetBase->SetHealth(Health);
+	}
+}
+
+void APrototypeCharacterBase::SetMana(float Mana)
+{
+	if (AttributeSetBase.IsValid())
+	{
+		AttributeSetBase->SetMana(Mana);
 	}
 }

@@ -43,6 +43,9 @@ protected:
 	TArray<TObjectPtr<UAttributeSet>> GrantedAttributeSets;
 };
 
+/*
+캐릭터에게 부여할 GameplayAbility와 GameplayEffect
+ */
 UCLASS()
 class THIRDPERSON_API UPrototypeAbilitySet : public UPrimaryDataAsset
 {

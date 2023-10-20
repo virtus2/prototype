@@ -33,21 +33,29 @@ public:
 	
 	UPrototypeAttributeSet* GetAttributeSetBase() const;
 
-	UFUNCTION(BlueprintCallable, Category = "GASDocumentation|GDPlayerState|Attributes")
+	UFUNCTION(BlueprintCallable, Category = "Prototype|Attributes")
 	float GetHealth() const;
 
-	UFUNCTION(BlueprintCallable, Category = "GASDocumentation|GDPlayerState|Attributes")
+	UFUNCTION(BlueprintCallable, Category = "Prototype|Attributes")
 	float GetMaxHealth() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Prototype|Attributes")
+	float GetMana() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Prototype|Attributes")
+	float GetMaxMana() const;
 
 
 protected:
 	FDelegateHandle HealthChangedDelegateHandle;
 	FDelegateHandle MaxHealthChangedDelegateHandle;
+	FDelegateHandle ManaChangedDelegateHandle;
+	FDelegateHandle MaxManaChangedDelegateHandle;
 
 	virtual void HealthChanged(const FOnAttributeChangeData& Data);
 	virtual void MaxHealthChanged(const FOnAttributeChangeData& Data);
-
-
+	virtual void ManaChanged(const FOnAttributeChangeData& Data);
+	virtual void MaxManaChanged(const FOnAttributeChangeData& Data);
 
 	//~AActor interface
 	virtual void BeginPlay() override;

@@ -7,6 +7,7 @@
 #include "PrototypePlayerController.generated.h"
 
 class UPrototypeHUDWidget;
+struct FGameplayTag;
 
 UCLASS()
 class THIRDPERSON_API APrototypePlayerController : public APlayerController
@@ -21,7 +22,6 @@ protected:
 	virtual void OnPossess(APawn* InPawn) override;
 
 	virtual void OnRep_PlayerState() override;
-
 private:
 
 
@@ -32,5 +32,6 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, Category="Prototype|UI")
 	TObjectPtr<UPrototypeHUDWidget> PrototypeHUDWidget;
+
 
 };

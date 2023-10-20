@@ -3,27 +3,30 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "PTCharacterBase.h"
-#include "PTHeroCharacter.generated.h"
+#include "PrototypeCharacterBase.h"
+#include "PrototypeHeroCharacter.generated.h"
 
+struct FGameplayTag;
 struct FInputActionValue;
 class UInputAction;
 class UCameraComponent;
 class USpringArmComponent;
 class UInputMappingContext;
+class UPrototypeInputConfig;
 /**
  * 
  */
 UCLASS()
-class THIRDPERSON_API APTHeroCharacter : public APTCharacterBase
+class THIRDPERSON_API APrototypeHeroCharacter : public APrototypeCharacterBase
 {
 	GENERATED_BODY()
 	
 public:
-	APTHeroCharacter(const class FObjectInitializer& ObjectInitializer);
+	APrototypeHeroCharacter(const class FObjectInitializer& ObjectInitializer);
 	
 protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
 
 	// Only called on the Server. Calls before Server's AcknowledgePossession.
 	virtual void PossessedBy(AController* NewController) override;
@@ -37,6 +40,11 @@ protected:
     virtual void JumpStop(const FInputActionValue& Value);
 
 private:
+    virtual void InitAbilityActorInfo() override;
+
+    void AbilityInputTagPressed(FGameplayTag InputTag);
+    void AbilityInputTagReleased(FGameplayTag InputTag);
+    void AbilityInputTagHeld(FGameplayTag InputTag);
 
 public:
 
@@ -50,28 +58,32 @@ protected:
     /*
      *   Enhanced Input...
      */
-    UPROPERTY(EditDefaultsOnly, Category = "Prototype Character|Enhanced Input")
+    UPROPERTY(EditDefaultsOnly, Category = "Prototype|Enhanced Input")
     TObjectPtr<UInputMappingContext> InputMapping;
 
-    UPROPERTY(EditDefaultsOnly, Category = "Prototype Character|Enhanced Input")
+    UPROPERTY(EditDefaultsOnly, Category = "Prototype|Enhanced Input")
     TObjectPtr<UInputAction> MoveAction;
 
-    UPROPERTY(EditDefaultsOnly, Category = "Prototype Character|Enhanced Input")
+    UPROPERTY(EditDefaultsOnly, Category = "Prototype|Enhanced Input")
     TObjectPtr<UInputAction> LookAction;
 
-    UPROPERTY(EditDefaultsOnly, Category = "Prototype Character|Enhanced Input")
+    UPROPERTY(EditDefaultsOnly, Category = "Prototype|Enhanced Input")
     TObjectPtr<UInputAction> JumpAction;
 
-    UPROPERTY(EditDefaultsOnly, Category = "Prototype Character|Enhanced Input")
+    UPROPERTY(EditDefaultsOnly, Category = "Prototype|Enhanced Input")
     TObjectPtr<UInputAction> BasicFireAction;
 
-    UPROPERTY(EditDefaultsOnly, Category = "Prototype Character|Enhanced Input")
+    UPROPERTY(EditDefaultsOnly, Category = "Prototype|Enhanced Input")
     TObjectPtr<UInputAction> SpecialMoveRAction;
 
-    UPROPERTY(EditDefaultsOnly, Category = "Prototype Character|Enhanced Input")
+    UPROPERTY(EditDefaultsOnly, Category = "Prototype|Enhanced Input")
     TObjectPtr<UInputAction> SpecialMoveEAction;
 
-    UPROPERTY(EditDefaultsOnly, Category = "Prototype Character|Enhanced Input")
+    UPROPERTY(EditDefaultsOnly, Category = "Prototype|Enhanced Input")
     TObjectPtr<UInputAction> SpecialMoveQAction;
+
+    UPROPERTY(EditDefaultsOnly, Category = "Prototype|Enhanced Input")
+    TObjectPtr<UPrototypeInputConfig> InputConfig;
+    
 	
 };

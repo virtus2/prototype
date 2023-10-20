@@ -45,6 +45,8 @@ public:
 
 	ATTRIBUTE_ACCESSORS(UPrototypeAttributeSet, Health);
 	ATTRIBUTE_ACCESSORS(UPrototypeAttributeSet, MaxHealth);
+	ATTRIBUTE_ACCESSORS(UPrototypeAttributeSet, Mana);
+	ATTRIBUTE_ACCESSORS(UPrototypeAttributeSet, MaxMana);
 
 protected:
 	// Helper function to proportionally adjust the value of an attribute when it's associated max attribute changes.
@@ -56,6 +58,12 @@ protected:
 
 	UFUNCTION()
 	void OnRep_MaxHealth(const FGameplayAttributeData& OldValue);
+
+	UFUNCTION()
+	void OnRep_Mana(const FGameplayAttributeData& OldValue);
+
+	UFUNCTION()
+	void OnRep_MaxMana(const FGameplayAttributeData& OldValue);
 
 private:
 
@@ -69,6 +77,14 @@ protected:
 	// The current max health attribute.  Max health is an attribute since gameplay effects can modify it.
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MaxHealth, Category = "Prototype|Health", Meta = (AllowPrivateAccess = true))
 	FGameplayAttributeData MaxHealth;
+
+	// The current max health attribute.  Max health is an attribute since gameplay effects can modify it.
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Mana, Category = "Prototype|Mana", Meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData Mana;
+
+	// The current max health attribute.  Max health is an attribute since gameplay effects can modify it.
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MaxMana, Category = "Prototype|Mana", Meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData MaxMana;
 
 private:
 

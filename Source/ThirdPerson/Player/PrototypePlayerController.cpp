@@ -3,9 +3,9 @@
 
 #include "PrototypePlayerController.h"
 
-#include "PrototypeHUDWidget.h"
-#include "PrototypePlayerState.h"
-#include "PrototypeAbilitySystemComponent.h"
+#include "ThirdPerson/UI/PrototypeHUDWidget.h"
+#include "ThirdPerson/Player/PrototypePlayerState.h"
+#include "ThirdPerson/Abilities/PrototypeAbilitySystemComponent.h"
 
 void APrototypePlayerController::CreateHUD()
 {
@@ -27,13 +27,12 @@ void APrototypePlayerController::CreateHUD()
 		return;
 	}
 
-
 	PrototypeHUDWidget->AddToViewport();
 	// TODO: HUD에 Attribute 값 세팅
 	PrototypeHUDWidget->SetMaxHealth(PS->GetMaxHealth());
 	PrototypeHUDWidget->SetCurrentHealth(PS->GetHealth());
-
-
+	PrototypeHUDWidget->SetMaxMana(PS->GetMaxMana());
+	PrototypeHUDWidget->SetCurrentMana(PS->GetMana());
 }
 
 void APrototypePlayerController::OnPossess(APawn* InPawn)

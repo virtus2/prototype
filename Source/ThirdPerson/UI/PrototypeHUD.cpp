@@ -5,11 +5,11 @@
 #include <GameFramework/PlayerController.h>
 #include <Blueprint/UserWidget.h>
 #include <Kismet/GameplayStatics.h>
-#include <ThirdPerson/PrototypeHUDWidget.h>
+#include "ThirdPerson/UI/PrototypeHUDWidget.h"
 
 void APrototypeHUD::BeginPlay()
 {
-    InitHUD();
+    // InitHUD();
 }
 
 void APrototypeHUD::InitHUD()

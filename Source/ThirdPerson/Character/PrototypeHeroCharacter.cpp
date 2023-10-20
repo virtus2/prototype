@@ -1,8 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "PTHeroCharacter.h"
+#include "PrototypeHeroCharacter.h"
 
+#include "GameplayTagContainer.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Camera/CameraComponent.h"
@@ -10,12 +11,13 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
-#include "PrototypePlayerState.h"
-#include "PrototypeAttributeSet.h"
-#include "PrototypePlayerController.h"
-#include "PrototypeAbilitySystemComponent.h"
+#include "ThirdPerson/Player/PrototypePlayerState.h"
+#include "ThirdPerson/Player/PrototypePlayerController.h"
+#include "ThirdPerson/Abilities/PrototypeAttributeSet.h"
+#include "ThirdPerson/Abilities/PrototypeAbilitySystemComponent.h"
+#include "ThirdPerson/Input/PrototypeEnhancedInputComponent.h"
 
-APTHeroCharacter::APTHeroCharacter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+APrototypeHeroCharacter::APrototypeHeroCharacter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
     SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
     SpringArmComponent->SetupAttachment(GetCapsuleComponent());
@@ -29,7 +31,7 @@ APTHeroCharacter::APTHeroCharacter(const FObjectInitializer& ObjectInitializer) 
     GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 }
 
-void APTHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void APrototypeHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
     Super::SetupPlayerInputComponent(PlayerInputComponent);
     
@@ -47,45 +49,27 @@ void APTHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
     
     EnhancedInputSubsystem->AddMappingContext(InputMapping, 0);
 
-    auto EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+    auto EnhancedInputComponent = Cast<UPrototypeEnhancedInputComponent>(PlayerInputComponent);
     if (!EnhancedInputComponent)
     {
         return;
     }
 
     // EnhancedInput Bind Actions
-    EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APTHeroCharacter::Move);
-    EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APTHeroCharacter::Look);
-    EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &APTHeroCharacter::JumpStart);
-    EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &APTHeroCharacter::JumpStop);
-
+    EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APrototypeHeroCharacter::Move);
+    EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APrototypeHeroCharacter::Look);
     // Gameplay Ability System Bind Input
-    if (AbilitySystemComponent.IsValid())
-    {
-        FTopLevelAssetPath AbilityEnumAssetPath = FTopLevelAssetPath(FName("/Script/PrototypeEnum"), FName("EPrototypeAbilityInputID"));
-        /*
-        AbilitySystemComponent->BindAbilityActivationToInputComponent(EnhancedInputComponent, 
-            FGameplayAbilityInputBinds(FString("ConfirmTarget"), FString("CancelTarget"), 
-        */
-    }
+    EnhancedInputComponent->BindAbilityActions(InputConfig, this, &APrototypeHeroCharacter::AbilityInputTagPressed, &APrototypeHeroCharacter::AbilityInputTagReleased, &APrototypeHeroCharacter::AbilityInputTagHeld);
 }
 
-void APTHeroCharacter::PossessedBy(AController* NewController)
+void APrototypeHeroCharacter::PossessedBy(AController* NewController)
 {
     Super::PossessedBy(NewController);
 
-    TObjectPtr<APrototypePlayerState> PS = GetPlayerState<APrototypePlayerState>();
-    if (!IsValid(PS))
-    {
-        return;
-    }
-
-    AbilitySystemComponent = Cast<UPrototypeAbilitySystemComponent>(PS->GetAbilitySystemComponent());
-    AbilitySystemComponent->InitAbilityActorInfo(PS, this);
-    AttributeSetBase = PS->GetAttributeSetBase();
+    InitAbilityActorInfo();
     InitializeAttributes();
-
     SetHealth(GetMaxHealth());
+    SetMana(GetMaxMana());
 
     TObjectPtr<APrototypePlayerController> PC = Cast<APrototypePlayerController>(GetController());
     if (!IsValid(PC))
@@ -93,26 +77,13 @@ void APTHeroCharacter::PossessedBy(AController* NewController)
         return;
     }
     PC->CreateHUD();
-
 }
 
-void APTHeroCharacter::OnRep_PlayerState()
+void APrototypeHeroCharacter::OnRep_PlayerState()
 {
     Super::OnRep_PlayerState();
 
-    TObjectPtr<APrototypePlayerState> PS = GetPlayerState<APrototypePlayerState>();
-    if (!IsValid(PS))
-    {
-        return;
-    }
-
-    AbilitySystemComponent = Cast<UPrototypeAbilitySystemComponent>(PS->GetAbilitySystemComponent());
-    AbilitySystemComponent->InitAbilityActorInfo(PS, this);
-    AttributeSetBase = PS->GetAttributeSetBase();
-    InitializeAttributes();
-
-    SetHealth(GetMaxHealth());
-
+    InitAbilityActorInfo();
     TObjectPtr<APrototypePlayerController> PC = Cast<APrototypePlayerController>(GetController());
     if (!IsValid(PC))
     {
@@ -121,7 +92,7 @@ void APTHeroCharacter::OnRep_PlayerState()
     PC->CreateHUD();
 }
 
-void APTHeroCharacter::Move(const FInputActionValue& Value)
+void APrototypeHeroCharacter::Move(const FInputActionValue& Value)
 {
     auto AxisValues = Value.Get<FInputActionValue::Axis2D>();
     FRotator CharacterRotation = GetControlRotation();
@@ -137,19 +108,54 @@ void APTHeroCharacter::Move(const FInputActionValue& Value)
     AddMovementInput(ForwardDirection, AxisValues.Y);
 }
 
-void APTHeroCharacter::Look(const FInputActionValue& Value)
+void APrototypeHeroCharacter::Look(const FInputActionValue& Value)
 {
     auto AxisValues = Value.Get<FInputActionValue::Axis2D>();
     AddControllerYawInput(AxisValues.X);
     AddControllerPitchInput(AxisValues.Y);
 }
 
-void APTHeroCharacter::JumpStart(const FInputActionValue& Value)
+void APrototypeHeroCharacter::JumpStart(const FInputActionValue& Value)
 {
     Jump();
 }
 
-void APTHeroCharacter::JumpStop(const FInputActionValue& Value)
+void APrototypeHeroCharacter::JumpStop(const FInputActionValue& Value)
 {
     StopJumping();
+}
+
+void APrototypeHeroCharacter::InitAbilityActorInfo()
+{
+    Super::InitAbilityActorInfo();
+
+    TObjectPtr<APrototypePlayerState> PS = GetPlayerState<APrototypePlayerState>();
+    if (!IsValid(PS))
+    {
+        return;
+    }
+
+    AbilitySystemComponent = Cast<UPrototypeAbilitySystemComponent>(PS->GetAbilitySystemComponent());
+    AbilitySystemComponent->InitAbilityActorInfo(PS, this);
+    AttributeSetBase = PS->GetAttributeSetBase();
+}
+
+void APrototypeHeroCharacter::AbilityInputTagPressed(FGameplayTag InputTag)
+{
+    UE_LOG(LogTemp, Warning, TEXT("AbilityInputTagPressed: %s"), *InputTag.ToString());
+    if (!AbilitySystemComponent.IsValid())
+    {
+        return;
+    }
+
+}
+
+void APrototypeHeroCharacter::AbilityInputTagReleased(FGameplayTag InputTag)
+{
+    UE_LOG(LogTemp, Warning, TEXT("AbilityInputTagReleased: %s"), *InputTag.ToString());
+}
+
+void APrototypeHeroCharacter::AbilityInputTagHeld(FGameplayTag InputTag)
+{
+    UE_LOG(LogTemp, Warning, TEXT("AbilityInputTagHeld: %s"), *InputTag.ToString());
 }

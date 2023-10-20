@@ -17,6 +17,8 @@ void UPrototypeAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty
 
 	DOREPLIFETIME_CONDITION_NOTIFY(UPrototypeAttributeSet, Health, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UPrototypeAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UPrototypeAttributeSet, Mana, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UPrototypeAttributeSet, MaxMana, COND_None, REPNOTIFY_Always);
 }
 
 void UPrototypeAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
@@ -46,10 +48,19 @@ void UPrototypeAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModC
 	}
 	else if (Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
-		// 이 게임플레이 이펙트는 Health를 변경합니다. 적용하되 우선 값을 제한합니다.
-		// 이 경우 Health 베이스 값은 음수가 아니어야 합니다.
 		UE_LOG(LogTemp, Warning, TEXT("PostGameplayEffectExecute Health"));
 		SetHealth(FMath::Max(GetHealth(), 0.0f));
+	}
+	else if (Data.EvaluatedData.Attribute == GetMaxManaAttribute())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PostGameplayEffectExecute MaxMana %f"),
+			Data.EvaluatedData.Magnitude);
+	}
+	else if (Data.EvaluatedData.Attribute == GetManaAttribute())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PostGameplayEffectExecute Mana %f"),
+			Data.EvaluatedData.Magnitude);
+		SetHealth(FMath::Max(GetMana(), 0.0f));
 	}
 }
 
@@ -75,4 +86,14 @@ void UPrototypeAttributeSet::OnRep_Health(const FGameplayAttributeData& OldValue
 void UPrototypeAttributeSet::OnRep_MaxHealth(const FGameplayAttributeData& OldValue)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UPrototypeAttributeSet, MaxHealth, OldValue);
+}
+
+void UPrototypeAttributeSet::OnRep_Mana(const FGameplayAttributeData& OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UPrototypeAttributeSet, Mana, OldValue);
+}
+
+void UPrototypeAttributeSet::OnRep_MaxMana(const FGameplayAttributeData& OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UPrototypeAttributeSet, MaxMana, OldValue);
 }

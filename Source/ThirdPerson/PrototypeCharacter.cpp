@@ -11,12 +11,13 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "UObject/ConstructorHelpers.h"
-#include "ThirdPerson/PrototypeAbilitySystemComponent.h"
-#include "ThirdPerson/PrototypeAnimInstance.h"
+
+#include "ThirdPerson/Abilities/PrototypeAbilitySet.h"
+#include "ThirdPerson/Abilities/PrototypeAttributeSet.h"
+#include "ThirdPerson/Abilities/PrototypeAbilitySystemComponent.h"
+#include "ThirdPerson/Player/PrototypePlayerState.h"
+#include "ThirdPerson/Character/PrototypeAnimInstance.h"
 #include "ThirdPerson/PrototypeAIController.h"
-#include "ThirdPerson/PrototypeAttributeSet.h"
-#include "ThirdPerson/PrototypePlayerState.h"
-#include "ThirdPerson/PrototypeAbilitySet.h"
 
 APrototypeCharacter::APrototypeCharacter()
 {

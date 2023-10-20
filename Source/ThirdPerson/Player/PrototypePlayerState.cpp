@@ -5,10 +5,10 @@
 
 #include "Net/UnrealNetwork.h"
 
-#include "PTHeroCharacter.h"
-#include "PrototypePlayerController.h"
-#include "PrototypeAbilitySystemComponent.h"
-#include "PrototypeAttributeSet.h"
+#include "ThirdPerson/Character/PrototypeHeroCharacter.h"
+#include "ThirdPerson/Player/PrototypePlayerController.h"
+#include "ThirdPerson/Abilities/PrototypeAbilitySystemComponent.h"
+#include "ThirdPerson/Abilities/PrototypeAttributeSet.h"
 
 APrototypePlayerState::APrototypePlayerState(const FObjectInitializer& ObjectInitializer)
 {
@@ -49,11 +49,21 @@ float APrototypePlayerState::GetMaxHealth() const
     return AttributeSetBase->GetMaxHealth();
 }
 
+float APrototypePlayerState::GetMana() const
+{
+    return AttributeSetBase->GetMana();
+}
+
+float APrototypePlayerState::GetMaxMana() const
+{
+    return AttributeSetBase->GetMaxMana();
+}
+
 void APrototypePlayerState::HealthChanged(const FOnAttributeChangeData& Data)
 {
     float Health = Data.NewValue;
 
-    TObjectPtr<APTHeroCharacter> HeroCharacter = Cast<APTHeroCharacter>(GetPawn());
+    TObjectPtr<APrototypeHeroCharacter> HeroCharacter = Cast<APrototypeHeroCharacter>(GetPawn());
     if (!IsValid(HeroCharacter))
     {
         return;
@@ -67,7 +77,7 @@ void APrototypePlayerState::MaxHealthChanged(const FOnAttributeChangeData& Data)
 {
     float MaxHealth = Data.NewValue;
 
-    TObjectPtr<APTHeroCharacter> HeroCharacter = Cast<APTHeroCharacter>(GetPawn());
+    TObjectPtr<APrototypeHeroCharacter> HeroCharacter = Cast<APrototypeHeroCharacter>(GetPawn());
     if (!IsValid(HeroCharacter))
     {
         return;
@@ -75,6 +85,33 @@ void APrototypePlayerState::MaxHealthChanged(const FOnAttributeChangeData& Data)
 
     // TODO: Update the HUD
     UE_LOG(LogTemp, Warning, TEXT("MaxHealthChanged - NewValue: %f, OldValue: %f"), Data.NewValue, Data.OldValue);
+}
+
+void APrototypePlayerState::ManaChanged(const FOnAttributeChangeData& Data)
+{
+    float Mana = Data.NewValue;
+
+    TObjectPtr<APrototypeHeroCharacter> HeroCharacter = Cast<APrototypeHeroCharacter>(GetPawn());
+    if (!IsValid(HeroCharacter))
+    {
+        return;
+    }
+
+    // TODO: Update the HUD
+    UE_LOG(LogTemp, Warning, TEXT("ManaChanged - NewValue: %f, OldValue: %f"), Data.NewValue, Data.OldValue);
+}
+void APrototypePlayerState::MaxManaChanged(const FOnAttributeChangeData& Data)
+{
+    float MaxMana = Data.NewValue;
+
+    TObjectPtr<APrototypeHeroCharacter> HeroCharacter = Cast<APrototypeHeroCharacter>(GetPawn());
+    if (!IsValid(HeroCharacter))
+    {
+        return;
+    }
+
+    // TODO: Update the HUD
+    UE_LOG(LogTemp, Warning, TEXT("MaxManaChanged - NewValue: %f, OldValue: %f"), Data.NewValue, Data.OldValue);
 }
 
 void APrototypePlayerState::BeginPlay()

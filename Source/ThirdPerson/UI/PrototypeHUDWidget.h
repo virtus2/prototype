@@ -24,6 +24,15 @@ public:
     UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
     void SetHealthPercentage(float InHealthPercentage);
 
+    UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+    void SetMaxMana(float InMaxMana);
+
+    UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+    void SetCurrentMana(float InCurrentMana);
+
+    UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+    void SetManaPercentage(float InManaPercentage);
+
 protected:
 
 private:
@@ -39,5 +48,14 @@ protected:
 
     UPROPERTY(BlueprintReadWrite)
     float HealthPercentage;
+
+    UPROPERTY(BlueprintReadWrite)
+    float MaxMana;
+
+    UPROPERTY(BlueprintReadWrite)
+    float CurrentMana;
+
+    UPROPERTY(BlueprintReadWrite)
+    float ManaPercentage;
 
 };
