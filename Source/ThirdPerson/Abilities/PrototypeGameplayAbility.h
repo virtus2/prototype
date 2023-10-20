@@ -6,9 +6,8 @@
 #include "Abilities/GameplayAbility.h"
 #include "PrototypeGameplayAbility.generated.h"
 
-/**
- * 
- */
+struct FGameplayTag;
+
 UCLASS()
 class THIRDPERSON_API UPrototypeGameplayAbility : public UGameplayAbility
 {
@@ -20,6 +19,8 @@ public:
 
 protected:
 	// TODO: 바인딩할 UInputAction 추가?
+	UPROPERTY(EditDefaultsOnly, Category = "Prototype|Input")
+	FGameplayTag StartupInputTag;
 
 	// TODO: Booleans / Bitfields for core checks that we don't want to add tags to every ability for.
 	// Examples

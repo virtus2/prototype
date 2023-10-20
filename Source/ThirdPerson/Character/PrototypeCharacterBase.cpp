@@ -84,12 +84,8 @@ void APrototypeCharacterBase::AddCharacterAbilities()
 		return;
 	}
 
-	for (TSubclassOf<UPrototypeGameplayAbility>& StartupAbility : CharacterAbilities)
-	{
-		// TODO: 어빌리티 레벨과 인풋ID를 어떻게 해야할까
-		AbilitySystemComponent->GiveAbility(
-			FGameplayAbilitySpec(StartupAbility, 1, -1, this));
-	}
+	UPrototypeAbilitySystemComponent* PrototypeASC = CastChecked<UPrototypeAbilitySystemComponent>(AbilitySystemComponent);
+	PrototypeASC->AddCharacterAbilities(CharacterAbilities);
 
 	// AbilitySystemComponent->bCharacterAbilitiesGiven = true;
 }

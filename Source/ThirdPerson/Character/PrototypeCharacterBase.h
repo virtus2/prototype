@@ -6,8 +6,8 @@
 #include "GameFramework/Character.h"
 #include "PrototypeCharacterBase.generated.h"
 
+class UGameplayAbility;
 class UGameplayEffect;
-class UPrototypeGameplayAbility;
 class UPrototypeAttributeSet;
 class UPrototypeAbilitySystemComponent;
 
@@ -62,25 +62,20 @@ private:
 public:
 
 protected:
-
-	/*
-	 * 어빌리티 시스템 테스트
-	 */
-
 	TWeakObjectPtr<UPrototypeAbilitySystemComponent> AbilitySystemComponent;
 	TWeakObjectPtr<UPrototypeAttributeSet> AttributeSetBase;
 
 	 // Default attributes for a character for initializing on spawn/respawn.
 	 // This is an instant GE that overrides the values for attributes that get reset on spawn/respawn.
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Prototype Character|Abilities")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Prototype|Abilities")
 	TSubclassOf<UGameplayEffect> DefaultAttributes;
 
 	// Default abilities for this Character. These will be removed on Character death and regiven if Character respawns.
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Prototype Character|Abilities")
-	TArray<TSubclassOf<UPrototypeGameplayAbility>> CharacterAbilities;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Prototype|Abilities")
+	TArray<TSubclassOf<UGameplayAbility>> CharacterAbilities;
 
 	// These effects are only applied one time on startup
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Prototype Character|Abilities")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Prototype|Abilities")
 	TArray<TSubclassOf<UGameplayEffect>> StartupEffects;
 
 private:

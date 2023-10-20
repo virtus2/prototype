@@ -148,6 +148,11 @@ void APrototypeHeroCharacter::AbilityInputTagPressed(FGameplayTag InputTag)
         return;
     }
 
+    if (!AbilitySystemComponent.IsValid())
+    {
+        return;
+    }
+    AbilitySystemComponent->AbilityInputTagPressed(InputTag);
 }
 
 void APrototypeHeroCharacter::AbilityInputTagReleased(FGameplayTag InputTag)

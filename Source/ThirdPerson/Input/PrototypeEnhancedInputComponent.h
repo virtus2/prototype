@@ -18,7 +18,6 @@ public:
 	/* InputConfig에서 정의한 <InputAction, InputTag> 쌍을 EnhancedInput에 바인딩한다. */
 	template<class UserClass, typename PressedFuncType, typename ReleasedFuncType, typename HeldFuncType>
 	void BindAbilityActions(const UPrototypeInputConfig* InputConfig, UserClass* Object, PressedFuncType PressedFunc, ReleasedFuncType ReleasedFunc, HeldFuncType HeldFunc);
-	
 };
 
 template<class UserClass, typename PressedFuncType, typename ReleasedFuncType, typename HeldFuncType>
