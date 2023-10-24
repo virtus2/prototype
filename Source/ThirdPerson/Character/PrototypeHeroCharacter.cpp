@@ -68,6 +68,7 @@ void APrototypeHeroCharacter::PossessedBy(AController* NewController)
 
     InitAbilityActorInfo();
     InitializeAttributes();
+    AddCharacterAbilities();
     SetHealth(GetMaxHealth());
     SetMana(GetMaxMana());
 
@@ -142,12 +143,6 @@ void APrototypeHeroCharacter::InitAbilityActorInfo()
 
 void APrototypeHeroCharacter::AbilityInputTagPressed(FGameplayTag InputTag)
 {
-    UE_LOG(LogTemp, Warning, TEXT("AbilityInputTagPressed: %s"), *InputTag.ToString());
-    if (!AbilitySystemComponent.IsValid())
-    {
-        return;
-    }
-
     if (!AbilitySystemComponent.IsValid())
     {
         return;
@@ -157,10 +152,18 @@ void APrototypeHeroCharacter::AbilityInputTagPressed(FGameplayTag InputTag)
 
 void APrototypeHeroCharacter::AbilityInputTagReleased(FGameplayTag InputTag)
 {
-    UE_LOG(LogTemp, Warning, TEXT("AbilityInputTagReleased: %s"), *InputTag.ToString());
+    if (!AbilitySystemComponent.IsValid())
+    {
+        return;
+    }
+    AbilitySystemComponent->AbilityInputTagReleased(InputTag);
 }
 
 void APrototypeHeroCharacter::AbilityInputTagHeld(FGameplayTag InputTag)
 {
-    UE_LOG(LogTemp, Warning, TEXT("AbilityInputTagHeld: %s"), *InputTag.ToString());
+    if (!AbilitySystemComponent.IsValid())
+    {
+        return;
+    }
+    AbilitySystemComponent->AbilityInputTagHeld(InputTag);
 }
