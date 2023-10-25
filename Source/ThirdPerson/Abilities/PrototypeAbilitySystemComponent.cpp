@@ -34,7 +34,6 @@ void UPrototypeAbilitySystemComponent::AbilityInputTagPressed(const FGameplayTag
 	FScopedAbilityListLock ActiveScopeLoc(*this);
 	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("AbilityInputTagPressed: %s"), *AbilitySpec.DynamicAbilityTags.ToString());
 		if (AbilitySpec.DynamicAbilityTags.HasTagExact(InputTag))
 		{
 			AbilitySpecInputPressed(AbilitySpec);
