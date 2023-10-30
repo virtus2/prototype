@@ -4,10 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
+#include "GameplayTagContainer.h"
 #include "PrototypeCharacter.h"
+#include "Game/Item/PrototypeEquipmentType.h"
 #include "PrototypeGameInstance.generated.h"
 
-struct FPrototypeCharacterStatus;
+struct FPrototypeEquipmentType;
 
 UCLASS()
 class THIRDPERSON_API UPrototypeGameInstance : public UGameInstance
@@ -25,6 +27,8 @@ private:
 public:
 
 protected:
+	UPROPERTY(EditDefaultsOnly, Category="Prototype|Data Table")
+	TObjectPtr<UDataTable> EquipmentTypeDataTable;
 
 private:
 

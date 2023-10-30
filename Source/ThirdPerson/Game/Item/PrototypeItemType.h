@@ -25,11 +25,4 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int ItemDropLevel;
 
-	/* 인벤토리 내에서 아이템의 너비 */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int InventoryItemWidth;
-
-	/* 인벤토리 내에서 아이템의 높이 */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int InventoryItemHeight;
 };
