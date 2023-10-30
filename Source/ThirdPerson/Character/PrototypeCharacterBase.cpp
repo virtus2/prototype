@@ -62,7 +62,6 @@ float APrototypeCharacterBase::GetMaxMana() const
 void APrototypeCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame

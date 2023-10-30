@@ -11,6 +11,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
+#include "ThirdPerson/PrototypeInventoryComponent.h"
 #include "ThirdPerson/Player/PrototypePlayerState.h"
 #include "ThirdPerson/Player/PrototypePlayerController.h"
 #include "ThirdPerson/Abilities/PrototypeAttributeSet.h"
@@ -29,6 +30,8 @@ APrototypeHeroCharacter::APrototypeHeroCharacter(const FObjectInitializer& Objec
     FollowCamera->FieldOfView = 80.0f;
 
     GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+
+    Inventory = CreateDefaultSubobject<UPrototypeInventoryComponent>(TEXT("Inventory"));
 }
 
 void APrototypeHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -58,6 +61,7 @@ void APrototypeHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerI
     // EnhancedInput Bind Actions
     EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APrototypeHeroCharacter::Move);
     EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APrototypeHeroCharacter::Look);
+    EnhancedInputComponent->BindAction(InventoryAction, ETriggerEvent::Completed, this, &APrototypeHeroCharacter::ActivateInventory);
     // Gameplay Ability System Bind Input
     EnhancedInputComponent->BindAbilityActions(InputConfig, this, &APrototypeHeroCharacter::AbilityInputTagPressed, &APrototypeHeroCharacter::AbilityInputTagReleased, &APrototypeHeroCharacter::AbilityInputTagHeld);
 }
@@ -166,4 +170,9 @@ void APrototypeHeroCharacter::AbilityInputTagHeld(FGameplayTag InputTag)
         return;
     }
     AbilitySystemComponent->AbilityInputTagHeld(InputTag);
+}
+
+void APrototypeHeroCharacter::ActivateInventory()
+{
+    Inventory->ActivateInventoryWidget();
 }

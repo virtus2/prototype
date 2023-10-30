@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "GameplayTagContainer.h"
 #include "PrototypeItem.generated.h"
 
 /**
@@ -14,4 +15,22 @@ class THIRDPERSON_API UPrototypeItem : public UObject
 {
 	GENERATED_BODY()
 	
+public:
+	UPrototypeItem();
+
+protected:
+
+private:
+
+public:
+	UPROPERTY(VisibleAnywhere)
+	FGameplayTag ItemType;
+
+	UPROPERTY(VisibleAnywhere)
+	FGameplayTag EquipmentType;
+
+protected:
+	
+
+private:
 };

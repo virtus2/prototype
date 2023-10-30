@@ -13,6 +13,7 @@ class UCameraComponent;
 class USpringArmComponent;
 class UInputMappingContext;
 class UPrototypeInputConfig;
+class UPrototypeInventoryComponent;
 /**
  * 
  */
@@ -20,7 +21,7 @@ UCLASS()
 class THIRDPERSON_API APrototypeHeroCharacter : public APrototypeCharacterBase
 {
 	GENERATED_BODY()
-	
+
 public:
 	APrototypeHeroCharacter(const class FObjectInitializer& ObjectInitializer);
 	
@@ -46,6 +47,8 @@ private:
     void AbilityInputTagReleased(FGameplayTag InputTag);
     void AbilityInputTagHeld(FGameplayTag InputTag);
 
+    void ActivateInventory();
+
 public:
 
 protected:
@@ -55,6 +58,8 @@ protected:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Prototype|Camera")
 	TObjectPtr<UCameraComponent> FollowCamera;
 
+    UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category="Prototype|Hero")
+    TObjectPtr<UPrototypeInventoryComponent> Inventory;
     /*
      *   Enhanced Input...
      */
@@ -68,22 +73,12 @@ protected:
     TObjectPtr<UInputAction> LookAction;
 
     UPROPERTY(EditDefaultsOnly, Category = "Prototype|Enhanced Input")
-    TObjectPtr<UInputAction> JumpAction;
-
-    UPROPERTY(EditDefaultsOnly, Category = "Prototype|Enhanced Input")
-    TObjectPtr<UInputAction> BasicFireAction;
-
-    UPROPERTY(EditDefaultsOnly, Category = "Prototype|Enhanced Input")
-    TObjectPtr<UInputAction> SpecialMoveRAction;
-
-    UPROPERTY(EditDefaultsOnly, Category = "Prototype|Enhanced Input")
-    TObjectPtr<UInputAction> SpecialMoveEAction;
-
-    UPROPERTY(EditDefaultsOnly, Category = "Prototype|Enhanced Input")
-    TObjectPtr<UInputAction> SpecialMoveQAction;
+    TObjectPtr<UInputAction> InventoryAction;
 
     UPROPERTY(EditDefaultsOnly, Category = "Prototype|Enhanced Input")
     TObjectPtr<UPrototypeInputConfig> InputConfig;
+
+private:
     
 	
 };

@@ -3,3 +3,10 @@
 
 #include "PrototypeItem.h"
 
+#include "GameplayTagContainer.h"
+
+#include "Game/Item/PrototypeEquipmentType.h"
+
+UPrototypeItem::UPrototypeItem()
+{
+}
