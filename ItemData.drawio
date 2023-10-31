@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2023-10-30T15:18:43.409Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36 Edg/118.0.2088.76" etag="UffAdrPdcHZwh-Y3XXLb" version="22.0.8" type="github">
+<mxfile host="app.diagrams.net" modified="2023-10-31T14:35:33.740Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36 Edg/118.0.2088.76" etag="-eIAZ3NSF50JsUolISY7" version="22.0.8" type="github">
   <diagram id="C5RBs43oDa-KdzZeNtuy" name="Page-1">
     <mxGraphModel dx="2045" dy="759" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -19,10 +19,10 @@
         <mxCell id="uqvtZdEYVKm4WlNIXN3L-53" value="- 사용 효과: FGameplayTag (함수 이름)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="uqvtZdEYVKm4WlNIXN3L-45" vertex="1">
           <mxGeometry y="52" width="230" height="24" as="geometry" />
         </mxCell>
-        <mxCell id="o3cVLX7GlPP_p-mK8Vke-2" value="- 인벤토리 내 너비: int" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="uqvtZdEYVKm4WlNIXN3L-45">
+        <mxCell id="o3cVLX7GlPP_p-mK8Vke-2" value="- 인벤토리 내 너비: int" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="uqvtZdEYVKm4WlNIXN3L-45" vertex="1">
           <mxGeometry y="76" width="230" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="o3cVLX7GlPP_p-mK8Vke-3" value="- 인벤토리 내 높이: int" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="uqvtZdEYVKm4WlNIXN3L-45">
+        <mxCell id="o3cVLX7GlPP_p-mK8Vke-3" value="- 인벤토리 내 높이: int" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="uqvtZdEYVKm4WlNIXN3L-45" vertex="1">
           <mxGeometry y="102" width="230" height="26" as="geometry" />
         </mxCell>
         <mxCell id="uqvtZdEYVKm4WlNIXN3L-54" value="- 벨트 장착 가능: bool" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="uqvtZdEYVKm4WlNIXN3L-45" vertex="1">
@@ -37,7 +37,7 @@
         <mxCell id="uqvtZdEYVKm4WlNIXN3L-64" value="- 아이템 장착 슬롯: FGameplayTag&lt;br&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="uqvtZdEYVKm4WlNIXN3L-56" vertex="1">
           <mxGeometry y="52" width="230" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="o3cVLX7GlPP_p-mK8Vke-1" value="- 인벤토리 내 너비: int" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="uqvtZdEYVKm4WlNIXN3L-56">
+        <mxCell id="o3cVLX7GlPP_p-mK8Vke-1" value="- 인벤토리 내 너비: int" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="uqvtZdEYVKm4WlNIXN3L-56" vertex="1">
           <mxGeometry y="78" width="230" height="26" as="geometry" />
         </mxCell>
         <mxCell id="uqvtZdEYVKm4WlNIXN3L-19" value="- 인벤토리 내 높이: int" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="uqvtZdEYVKm4WlNIXN3L-56" vertex="1">
@@ -58,10 +58,10 @@
         <mxCell id="uqvtZdEYVKm4WlNIXN3L-69" value="- 아이템 타입 이름: FGameplayTag" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="uqvtZdEYVKm4WlNIXN3L-68" vertex="1">
           <mxGeometry y="26" width="230" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="o3cVLX7GlPP_p-mK8Vke-5" value="- 인벤토리 내 너비: int" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="uqvtZdEYVKm4WlNIXN3L-68">
+        <mxCell id="o3cVLX7GlPP_p-mK8Vke-5" value="- 인벤토리 내 너비: int" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="uqvtZdEYVKm4WlNIXN3L-68" vertex="1">
           <mxGeometry y="52" width="230" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="o3cVLX7GlPP_p-mK8Vke-4" value="- 인벤토리 내 높이: int" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="uqvtZdEYVKm4WlNIXN3L-68">
+        <mxCell id="o3cVLX7GlPP_p-mK8Vke-4" value="- 인벤토리 내 높이: int" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="uqvtZdEYVKm4WlNIXN3L-68" vertex="1">
           <mxGeometry y="78" width="230" height="26" as="geometry" />
         </mxCell>
         <mxCell id="uqvtZdEYVKm4WlNIXN3L-73" value="- 장착 효과: FGameplayTag (효과 이름)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="uqvtZdEYVKm4WlNIXN3L-68" vertex="1">
@@ -153,6 +153,27 @@
         </mxCell>
         <mxCell id="uqvtZdEYVKm4WlNIXN3L-132" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="WIyWlLk6GJQsqaUBKTNV-1" source="uqvtZdEYVKm4WlNIXN3L-129" target="uqvtZdEYVKm4WlNIXN3L-64" edge="1">
           <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fvDbEHZVz452sutA-oqK-0" value="드랍 스팟" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=none;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="-590" y="340" width="270" height="182" as="geometry" />
+        </mxCell>
+        <mxCell id="fvDbEHZVz452sutA-oqK-1" value="- 드랍 스팟 이름: FGameplayTag" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="fvDbEHZVz452sutA-oqK-0">
+          <mxGeometry y="26" width="270" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="fvDbEHZVz452sutA-oqK-2" value="- 드랍 스팟 그룹: FGameplayTag&lt;br&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="fvDbEHZVz452sutA-oqK-0">
+          <mxGeometry y="52" width="270" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="fvDbEHZVz452sutA-oqK-3" value="- 드랍 체크 반복 횟수: int" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="fvDbEHZVz452sutA-oqK-0">
+          <mxGeometry y="78" width="270" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="fvDbEHZVz452sutA-oqK-4" value="- 드랍 레벨: int" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="fvDbEHZVz452sutA-oqK-0">
+          <mxGeometry y="104" width="270" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="fvDbEHZVz452sutA-oqK-5" value="- 드랍X 가중치: int" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="fvDbEHZVz452sutA-oqK-0">
+          <mxGeometry y="130" width="270" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="fvDbEHZVz452sutA-oqK-6" value="- 드랍 가중치: TMap&amp;lt;아이템클래스, int&amp;gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="fvDbEHZVz452sutA-oqK-0">
+          <mxGeometry y="156" width="270" height="26" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
