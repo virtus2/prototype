@@ -28,10 +28,10 @@ void UPrototypeInventoryWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	// TODO: 버튼 눌렀을때 다시 닫히게 해야함
 	FOnInputAction InputActionDelegate;
 	InputActionDelegate.BindUFunction(this, "OnInventoryActionTriggered");
 	ListenForInputAction(FName(TEXT("IA_Inventory")), IE_Pressed, true, InputActionDelegate);
-
 }
 
 void UPrototypeInventoryWidget::OnInventoryActionTriggered()

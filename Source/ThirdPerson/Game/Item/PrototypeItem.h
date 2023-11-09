@@ -29,6 +29,15 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	FGameplayTag EquipmentType;
 
+	UPROPERTY(VisibleAnywhere)
+	int ItemLevel;
+
+	UPROPERTY(VisibleAnywhere)
+	FName ItemName;
+
+	UPROPERTY(VisibleAnywhere)
+	
+
 protected:
 	
 

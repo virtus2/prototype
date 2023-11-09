@@ -3,8 +3,8 @@
 
 #include "PrototypeInventoryComponent.h"
 
-#include "ThirdPerson/PrototypeItem.h"
-#include "ThirdPerson/PrototypeInventoryWidget.h"
+#include "ThirdPerson/Game/Item/PrototypeItem.h"
+#include "ThirdPerson/UI/PrototypeInventoryWidget.h"
 #include "ThirdPerson/Character/PrototypeHeroCharacter.h"
 
 // Sets default values for this component's properties

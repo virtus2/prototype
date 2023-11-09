@@ -5,8 +5,9 @@
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
 #include "GameplayTagContainer.h"
-#include "PrototypeCharacter.h"
-#include "Game/Item/PrototypeEquipmentType.h"
+
+#include "ThirdPerson/Game/Item/PrototypeEquipmentType.h"
+
 #include "PrototypeGameInstance.generated.h"
 
 struct FPrototypeEquipmentType;

@@ -11,9 +11,9 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
-#include "ThirdPerson/PrototypeInventoryComponent.h"
 #include "ThirdPerson/Player/PrototypePlayerState.h"
 #include "ThirdPerson/Player/PrototypePlayerController.h"
+#include "ThirdPerson/Character/PrototypeInventoryComponent.h"
 #include "ThirdPerson/Abilities/PrototypeAttributeSet.h"
 #include "ThirdPerson/Abilities/PrototypeAbilitySystemComponent.h"
 #include "ThirdPerson/Input/PrototypeEnhancedInputComponent.h"
