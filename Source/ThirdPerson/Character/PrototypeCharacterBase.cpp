@@ -24,36 +24,36 @@ APrototypeCharacterBase::APrototypeCharacterBase(const FObjectInitializer& Objec
 
 float APrototypeCharacterBase::GetHealth() const
 {
-	if (AttributeSetBase.IsValid())
+	if (AttributeSet.IsValid())
 	{
-		return AttributeSetBase->GetHealth();
+		return AttributeSet->GetHealth();
 	}
 	return 0.0f;
 }
 
 float APrototypeCharacterBase::GetMaxHealth() const
 {
-	if (AttributeSetBase.IsValid())
+	if (AttributeSet.IsValid())
 	{
-		return AttributeSetBase->GetMaxHealth();
+		return AttributeSet->GetMaxHealth();
 	}
 	return 0.0f;
 }
 
 float APrototypeCharacterBase::GetMana() const
 {
-	if (AttributeSetBase.IsValid())
+	if (AttributeSet.IsValid())
 	{
-		return AttributeSetBase->GetMana();
+		return AttributeSet->GetMana();
 	}
 	return 0.0f;
 }
 
 float APrototypeCharacterBase::GetMaxMana() const
 {
-	if (AttributeSetBase.IsValid())
+	if (AttributeSet.IsValid())
 	{
-		return AttributeSetBase->GetMaxMana();
+		return AttributeSet->GetMaxMana();
 	}
 	return 0.0f;
 }
@@ -68,7 +68,6 @@ void APrototypeCharacterBase::BeginPlay()
 void APrototypeCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void APrototypeCharacterBase::InitAbilityActorInfo()
@@ -119,16 +118,16 @@ void APrototypeCharacterBase::AddStartupEffects()
 
 void APrototypeCharacterBase::SetHealth(float Health)
 {
-	if (AttributeSetBase.IsValid())
+	if (AttributeSet.IsValid())
 	{
-		AttributeSetBase->SetHealth(Health);
+		AttributeSet->SetHealth(Health);
 	}
 }
 
 void APrototypeCharacterBase::SetMana(float Mana)
 {
-	if (AttributeSetBase.IsValid())
+	if (AttributeSet.IsValid())
 	{
-		AttributeSetBase->SetMana(Mana);
+		AttributeSet->SetMana(Mana);
 	}
 }

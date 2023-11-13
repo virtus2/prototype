@@ -27,7 +27,7 @@ public:
 	
 protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
+    virtual void Tick(float DeltaTime) override;
 
 	// Only called on the Server. Calls before Server's AcknowledgePossession.
 	virtual void PossessedBy(AController* NewController) override;
@@ -49,6 +49,8 @@ private:
 
     void ActivateInventory();
 
+    void AimLineTrace(FHitResult& HitResult);
+
 public:
 
 protected:
@@ -60,6 +62,11 @@ protected:
 
     UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category="Prototype|Hero")
     TObjectPtr<UPrototypeInventoryComponent> Inventory;
+
+    /* TODO: 이 데이터를 테이블로 옮긴다 */
+    UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Prototype|Hero")
+    FName MuzzleSocketName;
+
     /*
      *   Enhanced Input...
      */

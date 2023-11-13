@@ -31,7 +31,7 @@ public:
 	// IAbilitySystemInterface 
 	UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	
-	UPrototypeAttributeSet* GetAttributeSetBase() const;
+	UPrototypeAttributeSet* GetAttributeSet() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Prototype|Attributes")
 	float GetHealth() const;
@@ -82,7 +82,7 @@ protected:
 	TObjectPtr<UPrototypeAbilitySystemComponent> AbilitySystemComponent;
 
 	UPROPERTY()
-	UPrototypeAttributeSet* AttributeSetBase;
+	UPrototypeAttributeSet* AttributeSet;
 
 private:
 

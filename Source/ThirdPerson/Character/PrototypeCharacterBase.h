@@ -63,7 +63,7 @@ public:
 
 protected:
 	TWeakObjectPtr<UPrototypeAbilitySystemComponent> AbilitySystemComponent;
-	TWeakObjectPtr<UPrototypeAttributeSet> AttributeSetBase;
+	TWeakObjectPtr<UPrototypeAttributeSet> AttributeSet;
 
 	 // Default attributes for a character for initializing on spawn/respawn.
 	 // This is an instant GE that overrides the values for attributes that get reset on spawn/respawn.

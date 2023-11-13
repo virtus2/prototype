@@ -16,7 +16,7 @@ APrototypePlayerState::APrototypePlayerState(const FObjectInitializer& ObjectIni
     AbilitySystemComponent->SetIsReplicated(true);
     AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 
-    AttributeSetBase = CreateDefaultSubobject<UPrototypeAttributeSet>(TEXT("AttributeSetBase"));
+    AttributeSet = CreateDefaultSubobject<UPrototypeAttributeSet>(TEXT("AttributeSet"));
 
     // PlayerState의 NetUpdateFrequency 기본 값은 매우 낮기 때문에, 어빌리티 시스템에 렉을 유발할 수 있다.
     // 따라서 캐릭터의 값인 100과 같게 조정해준다. 하지만 1초에 100번 업데이트는 상용 게임에서 다소 높은 값일 수 있다.
@@ -34,29 +34,29 @@ UAbilitySystemComponent* APrototypePlayerState::GetAbilitySystemComponent() cons
     return GetPrototypeAbilitySystemComponent();
 }
 
-UPrototypeAttributeSet* APrototypePlayerState::GetAttributeSetBase() const
+UPrototypeAttributeSet* APrototypePlayerState::GetAttributeSet() const
 {
-    return AttributeSetBase;
+    return AttributeSet;
 }
 
 float APrototypePlayerState::GetHealth() const
 {
-    return AttributeSetBase->GetHealth();
+    return AttributeSet->GetHealth();
 }
 
 float APrototypePlayerState::GetMaxHealth() const
 {
-    return AttributeSetBase->GetMaxHealth();
+    return AttributeSet->GetMaxHealth();
 }
 
 float APrototypePlayerState::GetMana() const
 {
-    return AttributeSetBase->GetMana();
+    return AttributeSet->GetMana();
 }
 
 float APrototypePlayerState::GetMaxMana() const
 {
-    return AttributeSetBase->GetMaxMana();
+    return AttributeSet->GetMaxMana();
 }
 
 void APrototypePlayerState::HealthChanged(const FOnAttributeChangeData& Data)
@@ -120,7 +120,7 @@ void APrototypePlayerState::BeginPlay()
 
     if (AbilitySystemComponent)
     {
-        HealthChangedDelegateHandle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSetBase->GetHealthAttribute()).AddUObject(this, &APrototypePlayerState::HealthChanged);
+        HealthChangedDelegateHandle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetHealthAttribute()).AddUObject(this, &APrototypePlayerState::HealthChanged);
     }
 }
 
