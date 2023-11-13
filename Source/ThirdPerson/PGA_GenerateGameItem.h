@@ -13,5 +13,7 @@ UCLASS()
 class THIRDPERSON_API UPGA_GenerateGameItem : public UPrototypeGameplayAbility
 {
 	GENERATED_BODY()
+
+public:
 	
 };

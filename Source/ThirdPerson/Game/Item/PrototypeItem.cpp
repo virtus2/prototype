@@ -5,8 +5,6 @@
 
 #include "GameplayTagContainer.h"
 
-#include "ThirdPerson/Game/Item/PrototypeEquipmentType.h"
-
 UPrototypeItem::UPrototypeItem()
 {
 }

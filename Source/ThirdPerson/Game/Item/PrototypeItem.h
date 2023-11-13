@@ -34,8 +34,6 @@ public:
 
 	UPROPERTY(VisibleAnywhere)
 	FName ItemName;
-
-	UPROPERTY(VisibleAnywhere)
 	
 
 protected:
