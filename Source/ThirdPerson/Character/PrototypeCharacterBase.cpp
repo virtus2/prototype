@@ -5,9 +5,9 @@
 
 #include "Components/CapsuleComponent.h"
 
-#include "ThirdPerson/Abilities/PrototypeAttributeSet.h"
-#include "ThirdPerson/Abilities/PrototypeGameplayAbility.h"
-#include "ThirdPerson/Abilities/PrototypeAbilitySystemComponent.h"
+#include "ThirdPerson/Ability/PrototypeAttributeSet.h"
+#include "ThirdPerson/Ability/PrototypeGameplayAbility.h"
+#include "ThirdPerson/Ability/PrototypeAbilitySystemComponent.h"
 
 
 // Sets default values

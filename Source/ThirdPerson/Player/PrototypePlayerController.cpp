@@ -5,7 +5,7 @@
 
 #include "ThirdPerson/UI/PrototypeHUDWidget.h"
 #include "ThirdPerson/Player/PrototypePlayerState.h"
-#include "ThirdPerson/Abilities/PrototypeAbilitySystemComponent.h"
+#include "ThirdPerson/Ability/PrototypeAbilitySystemComponent.h"
 
 void APrototypePlayerController::CreateHUD()
 {

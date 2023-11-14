@@ -5,7 +5,7 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 
-#include "ThirdPerson/Abilities/PrototypeGameplayAbility.h"
+#include "ThirdPerson/Ability/PrototypeGameplayAbility.h"
 
 void UPrototypeAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities)
 {

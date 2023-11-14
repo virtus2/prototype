@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Abilities/PrototypeGameplayAbility.h"
+#include "Ability/PrototypeGameplayAbility.h"
 #include "PGA_GenerateGameItem.generated.h"
 
 /**

@@ -7,8 +7,8 @@
 
 #include "ThirdPerson/Character/PrototypeHeroCharacter.h"
 #include "ThirdPerson/Player/PrototypePlayerController.h"
-#include "ThirdPerson/Abilities/PrototypeAbilitySystemComponent.h"
-#include "ThirdPerson/Abilities/PrototypeAttributeSet.h"
+#include "ThirdPerson/Ability/PrototypeAbilitySystemComponent.h"
+#include "ThirdPerson/Ability/PrototypeAttributeSet.h"
 
 APrototypePlayerState::APrototypePlayerState(const FObjectInitializer& ObjectInitializer)
 {

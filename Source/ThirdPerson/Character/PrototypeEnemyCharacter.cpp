@@ -5,9 +5,9 @@
 
 #include "GameFramework/CharacterMovementComponent.h"
 
-#include "ThirdPerson/Abilities/PrototypeAttributeSet.h"
+#include "ThirdPerson/Ability/PrototypeAttributeSet.h"
 #include "ThirdPerson/PrototypeAIController.h"
-#include "ThirdPerson/Abilities/PrototypeAbilitySystemComponent.h"
+#include "ThirdPerson/Ability/PrototypeAbilitySystemComponent.h"
 
 APrototypeEnemyCharacter::APrototypeEnemyCharacter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -36,6 +36,10 @@ void APrototypeEnemyCharacter::PossessedBy(AController* NewController)
 
 	PrototypeAIController = Cast<APrototypeAIController>(NewController);
 	// TODO: BlackboardComponent, BehaviorTree 초기화
+}
+
+void APrototypeEnemyCharacter::SpawnTreasure()
+{
 }
 
 void APrototypeEnemyCharacter::BeginPlay()

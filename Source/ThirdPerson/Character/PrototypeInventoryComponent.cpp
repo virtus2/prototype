@@ -3,7 +3,7 @@
 
 #include "PrototypeInventoryComponent.h"
 
-#include "ThirdPerson/Game/Item/PrototypeItem.h"
+#include "ThirdPerson/Item/PrototypeItem.h"
 #include "ThirdPerson/UI/PrototypeInventoryWidget.h"
 #include "ThirdPerson/Character/PrototypeHeroCharacter.h"
 

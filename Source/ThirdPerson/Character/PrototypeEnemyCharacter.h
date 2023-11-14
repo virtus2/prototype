@@ -3,11 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
 #include "PrototypeCharacterBase.h"
+
+#include "GameplayTagContainer.h"
+
 #include "PrototypeEnemyCharacter.generated.h"
 
+struct FGameplayTag;
 class UBehaviorTree;
 class APrototypeAIController;
+class UPrototypeAnimInstance;
 
 UCLASS()
 class THIRDPERSON_API APrototypeEnemyCharacter : public APrototypeCharacterBase
@@ -18,6 +24,7 @@ public:
 	APrototypeEnemyCharacter(const class FObjectInitializer& ObjectInitializer);
 	
 	virtual void PossessedBy(AController* NewController) override;
+	virtual void SpawnTreasure();
 
 protected:
 	virtual void BeginPlay() override;
@@ -34,7 +41,20 @@ protected:
 	TObjectPtr<UBehaviorTree> BehaviorTree;
 	
 	UPROPERTY(EditAnywhere, Category="Prototype|AI")
-	TObjectPtr<APrototypeAIController>	PrototypeAIController;
+	TObjectPtr<APrototypeAIController> PrototypeAIController;
 
+	/* Enemy 데이터 */
+	UPROPERTY(EditDefaultsOnly, Category="Prototype|Data")
+	TObjectPtr<USkeletalMesh> EnemyMesh;
 
+	UPROPERTY(EditDefaultsOnly, Category="Prototype|Data")
+	TObjectPtr<UPrototypeAnimInstance> EnemyAnimInstance;
+
+	UPROPERTY(EditDefaultsOnly, Category="Prototype|Data")
+	FGameplayTag TreasureClass;
+
+	UPROPERTY(EditDefaultsOnly, Category="Prototype|Data")
+	float Level;
+
+	/* Enemy 데이터 끝*/
 };

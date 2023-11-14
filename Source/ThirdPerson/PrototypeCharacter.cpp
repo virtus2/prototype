@@ -12,9 +12,9 @@
 #include "Kismet/GameplayStatics.h"
 #include "UObject/ConstructorHelpers.h"
 
-#include "ThirdPerson/Abilities/PrototypeAbilitySet.h"
-#include "ThirdPerson/Abilities/PrototypeAttributeSet.h"
-#include "ThirdPerson/Abilities/PrototypeAbilitySystemComponent.h"
+#include "ThirdPerson/Ability/PrototypeAbilitySet.h"
+#include "ThirdPerson/Ability/PrototypeAttributeSet.h"
+#include "ThirdPerson/Ability/PrototypeAbilitySystemComponent.h"
 #include "ThirdPerson/Player/PrototypePlayerState.h"
 #include "ThirdPerson/Character/PrototypeAnimInstance.h"
 #include "ThirdPerson/PrototypeAIController.h"

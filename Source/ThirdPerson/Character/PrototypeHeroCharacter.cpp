@@ -14,8 +14,8 @@
 #include "ThirdPerson/Player/PrototypePlayerState.h"
 #include "ThirdPerson/Player/PrototypePlayerController.h"
 #include "ThirdPerson/Character/PrototypeInventoryComponent.h"
-#include "ThirdPerson/Abilities/PrototypeAttributeSet.h"
-#include "ThirdPerson/Abilities/PrototypeAbilitySystemComponent.h"
+#include "ThirdPerson/Ability/PrototypeAttributeSet.h"
+#include "ThirdPerson/Ability/PrototypeAbilitySystemComponent.h"
 #include "ThirdPerson/Input/PrototypeEnhancedInputComponent.h"
 
 APrototypeHeroCharacter::APrototypeHeroCharacter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
