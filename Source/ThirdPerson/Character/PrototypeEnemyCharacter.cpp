@@ -3,10 +3,14 @@
 
 #include "PrototypeEnemyCharacter.h"
 
+#include "Engine/DataTable.h"
+#include "Kismet/GameplayStatics.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
-#include "ThirdPerson/Ability/PrototypeAttributeSet.h"
 #include "ThirdPerson/PrototypeAIController.h"
+#include "ThirdPerson/Data/TreasureClass.h"
+#include "ThirdPerson/Game/PrototypeGameModeBase.h"
+#include "ThirdPerson/Ability/PrototypeAttributeSet.h"
 #include "ThirdPerson/Ability/PrototypeAbilitySystemComponent.h"
 
 APrototypeEnemyCharacter::APrototypeEnemyCharacter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -40,6 +44,15 @@ void APrototypeEnemyCharacter::PossessedBy(AController* NewController)
 
 void APrototypeEnemyCharacter::SpawnTreasure()
 {
+	const TObjectPtr<APrototypeGameModeBase> GameMode = Cast<APrototypeGameModeBase>(UGameplayStatics::GetGameMode(this));
+	if (!IsValid(GameMode))
+	{
+		return;
+	}
+	
+	// TODO: 아이템 만들어주는 클래스를 따로 만들어서 옮긴다
+	const FString Context;
+	FTreasureClass* TC = GameMode->TreasureClassDataTable->FindRow<FTreasureClass>(TreasureClass.GetTagName(), Context);
 }
 
 void APrototypeEnemyCharacter::BeginPlay()

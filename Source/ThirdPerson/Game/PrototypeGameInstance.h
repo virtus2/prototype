@@ -26,8 +26,6 @@ private:
 public:
 
 protected:
-	UPROPERTY(EditDefaultsOnly, Category="Prototype|Data Table")
-	TObjectPtr<UDataTable> EquipmentTypeDataTable;
 
 private:
 
