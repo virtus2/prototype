@@ -53,10 +53,56 @@ void APrototypeEnemyCharacter::SpawnTreasure()
 	// TODO: 아이템 만들어주는 클래스를 따로 만들어서 옮긴다
 	const FString Context;
 	FTreasureClass* TC = GameMode->TreasureClassDataTable->FindRow<FTreasureClass>(TreasureClass.GetTagName(), Context);
+	TArray<FTreasure> PickedTreasures;
+	// TODO: 음수 일경우 확정적으로 N개를 드랍한다.
+	if (TC->NumPicks < 0)
+	{
+
+	}
+	else
+	{
+		for (int picksLeft = TC->NumPicks; picksLeft > 0; picksLeft--)
+		{
+			int ProbTotal = TC->FreqNoDrop;
+			for (const auto& Treasure : TC->Treasures)
+			{
+				ProbTotal += Treasure.Probability;
+			}
+			
+			int RandomProb = FMath::RandRange(0, ProbTotal);
+			int ProbRollSum = 0;
+			for (const auto& Treasure : TC->Treasures)
+			{
+				ProbRollSum += Treasure.Probability;
+				if (ProbRollSum >= RandomProb)
+				{
+					PickedTreasures.Add(Treasure);
+					break;
+				}
+			}
+		}
+	}
+
+	for (const auto& Treasure : PickedTreasures)
+	{
+		// TreasureClass가 아닌 아이템 타입일 경우 해당 아이템을 드롭
+		if (Treasure.Treasure.MatchesTag(FGameplayTag::RequestGameplayTag("Item.Type")))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Item.Type"));
+		}
+		// TreasureClass일 경우
+		else if (Treasure.Treasure.MatchesTag(FGameplayTag::RequestGameplayTag("Item.Treasure")))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Item.Treasure"));
+		}
+	}
 }
 
 void APrototypeEnemyCharacter::BeginPlay()
 {
+	Super::BeginPlay();
+
+	SpawnTreasure();
 }
 
 void APrototypeEnemyCharacter::InitAbilityActorInfo()

@@ -50,7 +50,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category="Prototype|Data")
 	TObjectPtr<UPrototypeAnimInstance> EnemyAnimInstance;
 
-	UPROPERTY(EditDefaultsOnly, Category="Prototype|Data")
+	UPROPERTY(EditDefaultsOnly, Category="Prototype|Data", meta=(Categories="Item.Treasure"))
 	FGameplayTag TreasureClass;
 
 	UPROPERTY(EditDefaultsOnly, Category="Prototype|Data")
