@@ -91,21 +91,30 @@ TArray<TObjectPtr<UPrototypeItem>> UPrototypeItemGenerator::ItemsFromTreasureCla
 TObjectPtr<UPrototypeItem> UPrototypeItemGenerator::ItemFromItemTypeTag(FGameplayTag ItemTypeTag)
 {
 	TObjectPtr<UPrototypeItem> ResultItem;
-	FGameplayTag PickedEquipmentType; // 추첨한 
-
-	// FGameplayTag ItemGemTag = FGameplayTag::RequestGameplayTag("Item.Type.Gem");
+	FGameplayTag PickedEquipmentType;
 
 	// ItemTypeTag가 Equipment 전체일 경우, Equipment 중에서 하나를 뽑는다.
 	if (ItemTypeTag.MatchesTagExact(TAG_Item_Type_Equipment))
 	{
-		auto EquipmentTagContainer = UGameplayTagsManager::Get().RequestGameplayTagChildren(TAG_Item_Type_Equipment);
-		for (const auto& Tag : EquipmentTagContainer)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("%s"), *Tag.ToString());
-		}
-		int RandomIndex = FMath::RandRange(0, EquipmentTagContainer.Num() - 1);
-		PickedEquipmentType = EquipmentTagContainer.GetByIndex(RandomIndex);
+		auto TagChildren = UGameplayTagsManager::Get().RequestGameplayTagChildren(TAG_Item_Type_Equipment);
+		int RandomIndex = FMath::RandRange(0, TagChildren.Num() - 1);
+		PickedEquipmentType = TagChildren.GetByIndex(RandomIndex);
 	}
+	// ItemTypeTag가 Armor 전체일 경우, Armor 중에서 하나를 뽑는다.
+	else if (ItemTypeTag.MatchesTagExact(TAG_Item_Type_Equipment_Armor))
+	{
+		auto TagChildren = UGameplayTagsManager::Get().RequestGameplayTagChildren(TAG_Item_Type_Equipment_Armor);
+		int RandomIndex = FMath::RandRange(0, TagChildren.Num() - 1);
+		PickedEquipmentType = TagChildren.GetByIndex(RandomIndex);
+	}
+	// ItemTypeTag가 Weapon 전체일 경우, Weapon 중에서 하나를 뽑는다.
+	else if (ItemTypeTag.MatchesTagExact(TAG_Item_Type_Equipment_Weapon))
+	{
+		auto TagChildren = UGameplayTagsManager::Get().RequestGameplayTagChildren(TAG_Item_Type_Equipment_Weapon);
+		int RandomIndex = FMath::RandRange(0, TagChildren.Num() - 1);
+		PickedEquipmentType = TagChildren.GetByIndex(RandomIndex);
+	}
+
 	ResultItem = NewObject<UPrototypeItem>(GetWorld());
 	ResultItem->ItemType = ItemTypeTag;
 	ResultItem->EquipmentType = PickedEquipmentType;
