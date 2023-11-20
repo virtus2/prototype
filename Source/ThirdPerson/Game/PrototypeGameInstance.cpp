@@ -5,6 +5,8 @@
 
 #include "GameplayTagContainer.h"
 
+#include "ThirdPerson/PrototypeGameplayTags.h"
+
 UPrototypeGameInstance::UPrototypeGameInstance()
 {
 }

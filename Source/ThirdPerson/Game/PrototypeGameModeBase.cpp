@@ -3,3 +3,16 @@
 
 #include "PrototypeGameModeBase.h"
 
+#include "ThirdPerson/Item/PrototypeItemGenerator.h"
+
+APrototypeGameModeBase::APrototypeGameModeBase()
+{
+}
+
+void APrototypeGameModeBase::BeginPlay()
+{
+	ItemGenerator = NewObject<UPrototypeItemGenerator>(GetWorld());
+}
+
+
+

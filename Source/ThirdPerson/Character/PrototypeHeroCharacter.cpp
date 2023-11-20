@@ -76,7 +76,7 @@ void APrototypeHeroCharacter::Tick(float DeltaTime)
     AimLineTrace(/* out */HitResult);
     if (HitResult.bBlockingHit)
     {
-        UE_LOG(LogTemp, Warning, TEXT("AimLineTrace Hitted By: %s"), *(HitResult.GetActor()->GetFullName()));
+        // UE_LOG(LogTemp, Warning, TEXT("AimLineTrace Hitted By: %s"), *(HitResult.GetActor()->GetFullName()));
     }
 }
 
