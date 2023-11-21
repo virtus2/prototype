@@ -3,6 +3,10 @@
 
 #include "PrototypeGameplayTags.h"
 
+UE_DEFINE_GAMEPLAY_TAG(TAG_Item_Treasure, "Item.Treasure");
+
+UE_DEFINE_GAMEPLAY_TAG(TAG_Item_Type, "Item.Type");
+UE_DEFINE_GAMEPLAY_TAG(TAG_Item_Type_Gold, "Item.Type.Gold");
 UE_DEFINE_GAMEPLAY_TAG(TAG_Item_Type_Equipment, "Item.Type.Equipment");
 
 UE_DEFINE_GAMEPLAY_TAG(TAG_Item_Type_Equipment_Armor, "Item.Type.Equipment.Armor");

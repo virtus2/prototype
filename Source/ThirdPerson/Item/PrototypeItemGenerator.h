@@ -19,8 +19,9 @@ class THIRDPERSON_API UPrototypeItemGenerator : public UObject
 public:	
 	UPrototypeItemGenerator();
 
-	TArray<TObjectPtr<UPrototypeItem>> ItemsFromTreasureClassTag(FGameplayTag TreasureClassTag);
-	TObjectPtr<UPrototypeItem> ItemFromItemTypeTag(FGameplayTag ItemTypeTag);
+	TArray<TObjectPtr<UPrototypeItem>> GenerateItemsFromTreasureClassTag(FGameplayTag TreasureClassTag, int32 ItemLevel);
+	TArray<TObjectPtr<UPrototypeItem>> GetItemsFromTreasureClassTag(FGameplayTag TreasureClassTag, int32 ItemLevel);
+	TObjectPtr<UPrototypeItem> GetItemFromItemTypeTag(FGameplayTag ItemTypeTag, int32 ItemLevel);
 	FTreasure RollTreasurePick(FTreasureClass& TreasureClass);
 
 protected:

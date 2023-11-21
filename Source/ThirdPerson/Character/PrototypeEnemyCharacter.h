@@ -43,6 +43,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Prototype|AI")
 	TObjectPtr<APrototypeAIController> PrototypeAIController;
 
+	UPROPERTY(EditAnywhere, Category="Prototype")
+	int32 MonsterLevel;
+
 	/* Enemy 데이터 */
 	UPROPERTY(EditDefaultsOnly, Category="Prototype|Data")
 	TObjectPtr<USkeletalMesh> EnemyMesh;

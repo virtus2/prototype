@@ -8,6 +8,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 
 #include "ThirdPerson/PrototypeAIController.h"
+#include "ThirdPerson/Item/PrototypeItem.h"
 #include "ThirdPerson/Item/PrototypeItemGenerator.h"
 #include "ThirdPerson/Data/TreasureClass.h"
 #include "ThirdPerson/Game/PrototypeGameModeBase.h"
@@ -50,7 +51,7 @@ void APrototypeEnemyCharacter::SpawnTreasure()
 	{
 		return;
 	}
-	GameMode->ItemGenerator->ItemsFromTreasureClassTag(TreasureClass);
+	const auto& PickedItems = GameMode->ItemGenerator->GenerateItemsFromTreasureClassTag(TreasureClass, MonsterLevel);
 }
 
 void APrototypeEnemyCharacter::BeginPlay()

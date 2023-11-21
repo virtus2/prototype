@@ -7,4 +7,20 @@
 
 UPrototypeItem::UPrototypeItem()
 {
+	ItemType = FGameplayTag::EmptyTag;
+	EquipmentType = FGameplayTag::EmptyTag;
+	ItemLevel = 0;
+	ItemName = FName();
+	ItemStackAmount = 0;
+}
+
+void UPrototypeItem::DebugLog()
+{
+	UE_LOG(LogTemp, Warning, TEXT("ItemType: %s, EquipmentType: %s, ItemLevel: %d, ItemName: %s, ItemStackAmount: %d"),
+		*ItemType.ToString(),
+		*EquipmentType.ToString(),
+		ItemLevel,
+		*ItemName.ToString(),
+		ItemStackAmount
+	);
 }

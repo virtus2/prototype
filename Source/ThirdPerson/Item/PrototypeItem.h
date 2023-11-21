@@ -18,6 +18,8 @@ class THIRDPERSON_API UPrototypeItem : public UObject
 public:
 	UPrototypeItem();
 
+	virtual void DebugLog();
+
 protected:
 
 private:
@@ -34,6 +36,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere)
 	FName ItemName;
+
+	UPROPERTY(VisibleAnywhere)
+	int32 ItemStackAmount;
 	
 
 protected:

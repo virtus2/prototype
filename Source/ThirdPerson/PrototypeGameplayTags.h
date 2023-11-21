@@ -6,6 +6,10 @@
 #include "GameplayTagsManager.h"
 #include "GameplayTagContainer.h"
 
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Item_Treasure)
+
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Item_Type)
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Item_Type_Gold)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Item_Type_Equipment)
 
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Item_Type_Equipment_Armor)
