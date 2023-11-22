@@ -51,7 +51,7 @@ void APrototypeEnemyCharacter::SpawnTreasure()
 	{
 		return;
 	}
-	const auto& PickedItems = GameMode->ItemGenerator->GenerateItemsFromTreasureClassTag(TreasureClass, MonsterLevel);
+	const auto& PickedItems = GameMode->ItemGenerator->GenerateItems(TreasureClass, MonsterLevel);
 }
 
 void APrototypeEnemyCharacter::BeginPlay()

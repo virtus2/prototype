@@ -16,11 +16,12 @@ UPrototypeItem::UPrototypeItem()
 
 void UPrototypeItem::DebugLog()
 {
-	UE_LOG(LogTemp, Warning, TEXT("ItemType: %s, EquipmentType: %s, ItemLevel: %d, ItemName: %s, ItemStackAmount: %d"),
+	UE_LOG(LogTemp, Warning, TEXT("ItemType: %s, EquipmentType: %s, ItemLevel: %d, ItemName: %s, ItemStackAmount: %d, Rarity: %s"),
 		*ItemType.ToString(),
 		*EquipmentType.ToString(),
 		ItemLevel,
 		*ItemName.ToString(),
-		ItemStackAmount
+		ItemStackAmount,
+		*Rarity.ToString()
 	);
 }

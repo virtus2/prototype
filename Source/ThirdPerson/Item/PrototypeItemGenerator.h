@@ -19,13 +19,28 @@ class THIRDPERSON_API UPrototypeItemGenerator : public UObject
 public:	
 	UPrototypeItemGenerator();
 
-	TArray<TObjectPtr<UPrototypeItem>> GenerateItemsFromTreasureClassTag(FGameplayTag TreasureClassTag, int32 ItemLevel);
-	TArray<TObjectPtr<UPrototypeItem>> GetItemsFromTreasureClassTag(FGameplayTag TreasureClassTag, int32 ItemLevel);
-	TObjectPtr<UPrototypeItem> GetItemFromItemTypeTag(FGameplayTag ItemTypeTag, int32 ItemLevel);
-	FTreasure RollTreasurePick(FTreasureClass& TreasureClass);
+	TArray<TObjectPtr<UPrototypeItem>> GenerateItems(FGameplayTag TreasureClass, int32 MonsterLevel);
+protected:
+
+private:
+	TArray<TObjectPtr<UPrototypeItem>> RollTreasureClassPicks(FGameplayTag TreasureClassTag, int32 MonsterLevel);
+
+	TObjectPtr<UPrototypeItem> PickItem(FGameplayTag ItemType, int32 MonsterLevel, FTreasureClass* TreasureClass);
+	TObjectPtr<UPrototypeItem> PickItem_Equipment(FGameplayTag ItemType, int32 MonsterLevel, FTreasureClass* TreasureClass);
+	TObjectPtr<UPrototypeItem> PickItem_Gold(int32 MonsterLevel);
+
+	TObjectPtr<UPrototypeItem> GenerateItem_Equipment(FGameplayTag ItemType, int32 MonsterLevel, FTreasureClass* TreasureClass);
+	FGameplayTag RollItemRarity(FGameplayTag Rarity, int32 MonsterLevel, int32 ItemLevel, FTreasureClass* TreasureClass);
+	TObjectPtr<UPrototypeItem> GenerateItem_Gold(int32 MonsterLevel);
 
 protected:
 
 private:
+
+	UPROPERTY(EditDefaultsOnly, Category = "Prototype")
+	TObjectPtr<UDataTable> TreasureClassDataTable;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Prototype")
+	TObjectPtr<UDataTable> ItemTypeDataTable;
 
 };

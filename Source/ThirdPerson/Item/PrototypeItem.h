@@ -29,6 +29,9 @@ public:
 	FGameplayTag ItemType;
 
 	UPROPERTY(VisibleAnywhere)
+	FGameplayTag Rarity;
+
+	UPROPERTY(VisibleAnywhere)
 	FGameplayTag EquipmentType;
 
 	UPROPERTY(VisibleAnywhere)

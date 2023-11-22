@@ -20,6 +20,18 @@ struct FTreasure
 };
 
 USTRUCT(BlueprintType)
+struct FRarityFreq
+{
+    GENERATED_BODY()
+
+    UPROPERTY(EditAnywhere)
+    int32 Freq;
+
+    UPROPERTY(EditAnywhere, meta=(Categories="Item.Rarity"))
+    FGameplayTag Rarity;
+};
+
+USTRUCT(BlueprintType)
 struct FTreasureClass : public FTableRowBase
 {
     GENERATED_BODY()
@@ -38,11 +50,8 @@ struct FTreasureClass : public FTableRowBase
     int32 FreqNoDrop;
 
     UPROPERTY(EditAnywhere)
-    int32 FreqMagic;
+    TMap<FGameplayTag, int32> FreqRarities;
 
-    UPROPERTY(EditAnywhere)
-    int32 FreqRare;
-
-    UPROPERTY(EditAnywhere, meta=(TitleProperty="{Treasure}: {Probability}"))
+    UPROPERTY(EditAnywhere, meta=(TitleProperty="{Treasure}가 {Probability}의 비율로 생성"))
     TArray<FTreasure> Treasures;
 };

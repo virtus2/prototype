@@ -3,6 +3,13 @@
 
 #include "PrototypeGameplayTags.h"
 
+UE_DEFINE_GAMEPLAY_TAG(TAG_Item_Rarity, "Item.Rarity")
+UE_DEFINE_GAMEPLAY_TAG(TAG_Item_Rarity_Unique, "Item.Rarity.Unique")
+UE_DEFINE_GAMEPLAY_TAG(TAG_Item_Rarity_Set, "Item.Rarity.Set")
+UE_DEFINE_GAMEPLAY_TAG(TAG_Item_Rarity_Rare, "Item.Rarity.Rare")
+UE_DEFINE_GAMEPLAY_TAG(TAG_Item_Rarity_Magic, "Item.Rarity.Magic")
+UE_DEFINE_GAMEPLAY_TAG(TAG_Item_Rarity_Normal, "Item.Rarity.Normal")
+
 UE_DEFINE_GAMEPLAY_TAG(TAG_Item_Treasure, "Item.Treasure");
 
 UE_DEFINE_GAMEPLAY_TAG(TAG_Item_Type, "Item.Type");

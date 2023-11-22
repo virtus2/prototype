@@ -23,7 +23,4 @@ protected:
 public:
 	UPROPERTY(EditDefaultsOnly, Category="Prototype")
 	TObjectPtr<UPrototypeItemGenerator> ItemGenerator;
-
-	UPROPERTY(EditDefaultsOnly, Category="Prototype")
-	TObjectPtr<UDataTable> TreasureClassDataTable;
 };
