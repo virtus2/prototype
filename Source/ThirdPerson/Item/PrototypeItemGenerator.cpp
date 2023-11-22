@@ -104,6 +104,10 @@ TObjectPtr<UPrototypeItem> UPrototypeItemGenerator::GetItemFromItemTypeTag(FGame
 
 	if (ItemTypeTag.MatchesTag(TAG_Item_Type_Equipment))
 	{
+		// TODO: Generic Tag 일 경우, 하위 Tag들을 모두 가져온다.
+		// TODO: 하위 태그의 Rarity를 가중치로 활용, 이 중 하나를 뽑는다.
+		// TODO: 뽑은 태그 및 아이템 레벨에 맞는 아이템 데이터를 가져온다.
+		
 		// ItemTypeTag가 Equipment 전체일 경우, Equipment 중에서 하나를 뽑는다.
 		if (ItemTypeTag.MatchesTagExact(TAG_Item_Type_Equipment))
 		{
