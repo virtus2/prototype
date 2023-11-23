@@ -194,7 +194,8 @@ TObjectPtr<UPrototypeItem> UPrototypeItemGenerator::GenerateItem_Equipment(FGame
 
 	// TODO: 아이템의 희귀도를 결정한다. ItemRatio.txt
 	// 제일 높은 희귀도인 Unique부터 희귀도를 계산해 제일 낮은 희귀도인 Normal까지 내려간다...
-	EquipmentItem->Rarity = RollItemRarity(TAG_Item_Rarity_Unique, MonsterLevel, ItemLevel, TreasureClass);
+	// TODO: ItemType에 ClassSpecific 정보를 추가한다.
+	EquipmentItem->Rarity = RollItemRarity(TAG_Item_Rarity_Unique, MonsterLevel, ItemLevel, TreasureClass, false);
 	// TODO: 고유아이템이거나 세트아이템일 경우 UniqueItems.txt, SetItems.txt에서 뽑아서 드랍한다.
 	// TODO: 희귀도에 따라 접사를 붙인다.
 	// TODO: 접사에 따라 이름을 정한다.
@@ -207,25 +208,107 @@ TObjectPtr<UPrototypeItem> UPrototypeItemGenerator::GenerateItem_Equipment(FGame
 	return EquipmentItem;
 }
 
-FGameplayTag UPrototypeItemGenerator::RollItemRarity(FGameplayTag Rarity, int32 MonsterLevel, int32 ItemLevel, FTreasureClass* TreasureClass)
+FGameplayTag UPrototypeItemGenerator::RollItemRarity(FGameplayTag Rarity, int32 MonsterLevel, int32 ItemLevel, FTreasureClass* TreasureClass, bool bIsClassSpecific)
 {
-	int32 Quality = 1024;
-	int32 Divisor = 1024;
-	float BaseChance = (Quality - (MonsterLevel - ItemLevel) / Divisor) * 128;
-	// 매찬 적용
-	float MagicFindChance = 0.0f; // TODO: 캐릭터의 Attribute에서 MagicFind를 가져온다.
-	float MagicFindConstant = 600.0f;
-	float EffectiveMagicFindChance = (MagicFindChance * MagicFindConstant) / (MagicFindChance + MagicFindConstant); // TODO: 0으로 나누는 경우가 있으면 조심해야됨
-	float EffectiveChance = BaseChance * 100.0f / (100.0f + EffectiveMagicFindChance);
-	float QualityConstant = (float)*TreasureClass->FreqRarities.Find(Rarity);
-	float FinalChance = EffectiveChance * (1 - (QualityConstant / 1024));
-	float RandomValue = FMath::FRandRange(0, FinalChance - 1);
-	if (RandomValue > 128)
+	if (TreasureClass == nullptr)
 	{
-		return RollItemRarity(TAG_Item_Rarity_Set, MonsterLevel, ItemLevel, TreasureClass);
+		return TAG_Item_Rarity_Normal;
 	}
 
-	return Rarity;
+	int32 Quality;
+	int32 Divisor;
+	float MagicFindConstant;
+	if (bIsClassSpecific)
+	{
+		if (Rarity.MatchesTag(TAG_Item_Rarity_Unique))
+		{
+			Quality = Quality_ClassSpecific_Unique;
+			Divisor = Divisor_ClassSpecific_Unique;
+			MagicFindConstant = MagicFindConstant_Unique;
+		}
+		else if (Rarity.MatchesTag(TAG_Item_Rarity_Set))
+		{
+			Quality = Quality_ClassSpecific_Set;
+			Divisor = Divisor_ClassSpecific_Set;
+			MagicFindConstant = MagicFindConstant_Set;
+		}
+		else if (Rarity.MatchesTag(TAG_Item_Rarity_Rare))
+		{
+			Quality = Quality_ClassSpecific_Rare;
+			Divisor = Divisor_ClassSpecific_Rare;
+			MagicFindConstant = MagicFindConstant_Rare;
+		}
+		else if (Rarity.MatchesTag(TAG_Item_Rarity_Magic))
+		{
+			Quality = Quality_ClassSpecific_Magic;
+			Divisor = Divisor_ClassSpecific_Magic;
+		}
+	}
+	else
+	{
+		if (Rarity.MatchesTag(TAG_Item_Rarity_Unique))
+		{
+			Quality = Quality_Unique;
+			Divisor = Divisor_Unique;
+			MagicFindConstant = MagicFindConstant_Unique;
+		}
+		else if (Rarity.MatchesTag(TAG_Item_Rarity_Set))
+		{
+			Quality = Quality_Set;
+			Divisor = Divisor_Set;
+			MagicFindConstant = MagicFindConstant_Set;
+		}
+		else if (Rarity.MatchesTag(TAG_Item_Rarity_Rare))
+		{
+			Quality = Quality_Rare;
+			Divisor = Divisor_Rare;
+			MagicFindConstant = MagicFindConstant_Rare;
+		}
+		else if (Rarity.MatchesTag(TAG_Item_Rarity_Magic))
+		{
+			Quality = Quality_Magic;
+			Divisor = Divisor_Magic;
+		}
+	}
+	float BaseChance = (Quality - (MonsterLevel - ItemLevel) / Divisor) * 128;
+	// 매찬 적용
+	float MagicFindChance = 100.0f; // TODO: 캐릭터의 Attribute에서 MagicFind를 가져온다.
+	float EffectiveMagicFindChance = (MagicFindChance * MagicFindConstant) / (MagicFindChance + MagicFindConstant); // TODO: 0으로 나누는 경우가 있으면 조심해야됨
+	float EffectiveChance = BaseChance * 100.0f / (100.0f + EffectiveMagicFindChance);
+	float QualityConstant;
+	if (TreasureClass->FreqRarities.Contains(Rarity))
+	{
+		QualityConstant = (float)*TreasureClass->FreqRarities.Find(Rarity);
+	}
+	else
+	{
+		QualityConstant = 0;
+	}
+
+	float FinalChance = EffectiveChance * (1 - (QualityConstant / 1024));
+	float RandomValue = FMath::FRandRange(0, FinalChance - 1);
+	UE_LOG(LogTemp, Warning, TEXT("RandomValue: %f"), RandomValue);
+	if (RandomValue > 128)
+	{
+		if (Rarity.MatchesTag(TAG_Item_Rarity_Unique))
+		{
+			return RollItemRarity(TAG_Item_Rarity_Set, MonsterLevel, ItemLevel, TreasureClass, bIsClassSpecific);
+		}
+		else if (Rarity.MatchesTag(TAG_Item_Rarity_Set))
+		{
+			return RollItemRarity(TAG_Item_Rarity_Rare, MonsterLevel, ItemLevel, TreasureClass, bIsClassSpecific);
+		}
+		else if (Rarity.MatchesTag(TAG_Item_Rarity_Rare))
+		{
+			return RollItemRarity(TAG_Item_Rarity_Magic, MonsterLevel, ItemLevel, TreasureClass, bIsClassSpecific);
+		}
+	}
+	else
+	{
+		return Rarity;
+	}
+
+	return TAG_Item_Rarity_Normal;
 }
 
 TObjectPtr<UPrototypeItem> UPrototypeItemGenerator::GenerateItem_Gold(int32 MonsterLevel)
