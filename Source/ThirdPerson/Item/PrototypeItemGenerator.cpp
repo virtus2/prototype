@@ -287,7 +287,7 @@ FGameplayTag UPrototypeItemGenerator::RollItemRarity(FGameplayTag Rarity, int32 
 
 	float FinalChance = EffectiveChance * (1 - (QualityConstant / 1024));
 	float RandomValue = FMath::FRandRange(0, FinalChance - 1);
-	UE_LOG(LogTemp, Warning, TEXT("RandomValue: %f"), RandomValue);
+	UE_LOG(LogTemp, Warning, TEXT("Rarity(%s) Check: MF Chance(%f), Eff Chance(%f), Final Chance(%f)"), *Rarity.ToString(), MagicFindChance, EffectiveChance, FinalChance);
 	if (RandomValue > 128)
 	{
 		if (Rarity.MatchesTag(TAG_Item_Rarity_Unique))
