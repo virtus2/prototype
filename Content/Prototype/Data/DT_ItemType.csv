@@ -1,0 +1,3 @@
+---,ItemTypeTag,bCanEquip,EquipSlotTag,bCanHaveSockets,MaxSocketCount,TreasureClassPickWeight,InventoryWidth,InventoryHeight
+Item.Type.Equipment.Armor.BodyArmor,"(TagName=""Item.Type.Equipment.Armor.BodyArmor"")","False","(TagName="""")","False","()","0","0","0"
+Item.Type.Equipment.Armor.Helmet,"(TagName=""Item.Type.Equipment.Armor.Helmet"")","False","(TagName="""")","False","()","0","0","0"
