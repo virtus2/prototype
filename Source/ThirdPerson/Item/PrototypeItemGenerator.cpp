@@ -272,7 +272,7 @@ FGameplayTag UPrototypeItemGenerator::RollItemRarity(FGameplayTag Rarity, int32 
 	}
 	float BaseChance = (Quality - (MonsterLevel - ItemLevel) / Divisor) * 128;
 	// 매찬 적용
-	float MagicFindChance = 100.0f; // TODO: 캐릭터의 Attribute에서 MagicFind를 가져온다.
+	float MagicFindChance = 500.0f; // TODO: 캐릭터의 Attribute에서 MagicFind를 가져온다.
 	float EffectiveMagicFindChance = (MagicFindChance * MagicFindConstant) / (MagicFindChance + MagicFindConstant); // TODO: 0으로 나누는 경우가 있으면 조심해야됨
 	float EffectiveChance = BaseChance * 100.0f / (100.0f + EffectiveMagicFindChance);
 	float QualityConstant;
