@@ -26,6 +26,12 @@ UPrototypeItemGenerator::UPrototypeItemGenerator()
 	{
 		ItemTypeDataTable = ItemTypeDataTableClass.Object;
 	}
+
+	static ConstructorHelpers::FObjectFinder<UDataTable> ItemAffixDataTableClass(TEXT("/Game/Prototype/Data/DT_ItemAffix.DT_ItemAffix"));
+	if (IsValid(ItemAffixDataTableClass.Object))
+	{
+		ItemAffixDataTable = ItemAffixDataTableClass.Object;
+	}
 }
 
 TArray<TObjectPtr<UPrototypeItem>> UPrototypeItemGenerator::GenerateItems(FGameplayTag TreasureClass, int32 MonsterLevel)
@@ -187,17 +193,28 @@ TObjectPtr<UPrototypeItem> UPrototypeItemGenerator::GenerateItem_Equipment(FGame
 	EquipmentItem->ItemType = ItemType;
 	EquipmentItem->ItemStackAmount = 1;
 
-	// TODO: 아이템 레벨 값의 범위를 데이터 테이블로 옮긴다.
 	// 아이템 레벨을 결정한다.
+	// TODO: 아이템 레벨 값의 범위를 데이터 테이블로 옮긴다.
 	int ItemLevel = FMath::RandRange(MonsterLevel - 1, MonsterLevel + 1);
 	EquipmentItem->ItemLevel = ItemLevel;
 
-	// TODO: 아이템의 희귀도를 결정한다. ItemRatio.txt
-	// 제일 높은 희귀도인 Unique부터 희귀도를 계산해 제일 낮은 희귀도인 Normal까지 내려간다...
+	// 제일 높은 희귀도인 Unique부터 희귀도 랜덤뽑기
 	// TODO: ItemType에 ClassSpecific 정보를 추가한다.
 	EquipmentItem->Rarity = RollItemRarity(TAG_Item_Rarity_Unique, MonsterLevel, ItemLevel, TreasureClass, false);
+
 	// TODO: 고유아이템이거나 세트아이템일 경우 UniqueItems.txt, SetItems.txt에서 뽑아서 드랍한다.
-	// TODO: 희귀도에 따라 접사를 붙인다.
+	if (EquipmentItem->Rarity == TAG_Item_Rarity_Unique ||
+		EquipmentItem->Rarity == TAG_Item_Rarity_Set)
+	{
+		// 현재는 고유아이템이나 세트아이템을 구현하지 않음
+		EquipmentItem->Rarity = TAG_Item_Rarity_Rare;
+	}
+
+
+	// 희귀도에 따라 접사를 붙인다.
+	// TODO: 희귀도에 따른 최대 접사 개수를 데이터 테이블로 옮긴다.
+	RollItemAffixes(EquipmentItem);
+
 	// TODO: 접사에 따라 이름을 정한다.
 	
 	// TODO: 홈 보유 가능 여부에 따라 홈 갯수 추가한다.
@@ -309,6 +326,28 @@ FGameplayTag UPrototypeItemGenerator::RollItemRarity(FGameplayTag Rarity, int32 
 	}
 
 	return TAG_Item_Rarity_Normal;
+}
+
+void UPrototypeItemGenerator::RollItemAffixes(TObjectPtr<UPrototypeItem> Item)
+{
+	// 아이템에 붙을 수 있는 접사 갯수를 결정한다.
+	int32 MaxAffixCount = 0;
+	int32 PrefixCount = 0;
+	int32 SuffixCount = 0;
+	if (Item->Rarity == TAG_Item_Rarity_Rare)
+	{
+		// 레어 아이템은 접사가 최소 3개, 최대 6개
+		PrefixCount = FMath::RandRange(1, 3);
+		SuffixCount = FMath::RandRange(1, 6 - PrefixCount);
+	}
+	else if (Item->Rarity == TAG_Item_Rarity_Magic)
+	{
+		PrefixCount = FMath::RandRange(0, 1);
+		SuffixCount = FMath::RandRange(0, 2 - PrefixCount);
+	}
+	
+	UE_LOG(LogTemp, Warning, TEXT("Roll Item Affix: MaxAffixCount(%d), PrefixCount(%d), SuffixCount(%d)"), MaxAffixCount, PrefixCount, SuffixCount);
+
 }
 
 TObjectPtr<UPrototypeItem> UPrototypeItemGenerator::GenerateItem_Gold(int32 MonsterLevel)

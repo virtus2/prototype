@@ -31,6 +31,7 @@ private:
 
 	TObjectPtr<UPrototypeItem> GenerateItem_Equipment(FGameplayTag ItemType, int32 MonsterLevel, FTreasureClass* TreasureClass);
 	FGameplayTag RollItemRarity(FGameplayTag Rarity, int32 MonsterLevel, int32 ItemLevel, FTreasureClass* TreasureClass, bool bIsClassSpecific);
+	void RollItemAffixes(TObjectPtr<UPrototypeItem> Item);
 	
 	TObjectPtr<UPrototypeItem> GenerateItem_Gold(int32 MonsterLevel);
 
@@ -43,8 +44,14 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Prototype")
 	TObjectPtr<UDataTable> ItemTypeDataTable;
+
+	UPROPERTY(EditDefaultsOnly, Category="Prototype")
+	TObjectPtr<UDataTable> ItemAffixDataTable;
 	
 
+	/*
+	* 
+	*/
 	float MagicFindConstant_Unique = 250.0f;
 	float MagicFindConstant_Set = 500.0f;
 	float MagicFindConstant_Rare = 600.0f;
