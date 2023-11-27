@@ -5,7 +5,11 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "GameplayTagContainer.h"
+
+#include "ThirdPerson/Data/ItemAffix.h"
+
 #include "PrototypeItem.generated.h"
+
 
 /**
  * 
@@ -19,6 +23,8 @@ public:
 	UPrototypeItem();
 
 	virtual void DebugLog();
+
+	void AddAffix(FItemAffix* ItemAffix);
 
 protected:
 
@@ -42,10 +48,13 @@ public:
 
 	UPROPERTY(VisibleAnywhere)
 	int32 ItemStackAmount;
-	
 
 protected:
 	
 
 private:
+
+	UPROPERTY(VisibleAnywhere)
+	TArray<FItemAffix*> ItemAffixes;
+	
 };

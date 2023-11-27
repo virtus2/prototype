@@ -3,3 +3,15 @@
 
 #include "AttributeGameplayEffectMap.h"
 
+TSubclassOf<UGameplayEffect> UAttributeGameplayEffectMap::GetGameplayEffectByAttributeTag(FGameplayTag AttributeTag)
+{
+	auto GE = AttributeToGameplayEffect.Find(AttributeTag);
+	if (GE)
+	{
+		return GE->Get();
+	}
+	else
+	{
+		return nullptr;
+	}
+}

@@ -9,6 +9,7 @@
 
 #include "ThirdPerson/PrototypeGameplayTags.h"
 #include "ThirdPerson/Data/TreasureClass.h"
+#include "ThirdPerson/Data/ItemAffix.h"
 #include "ThirdPerson/Data/ItemType.h"
 #include "ThirdPerson/Item/PrototypeItem.h"
 #include "ThirdPerson/Game/PrototypeGameModeBase.h"
@@ -31,6 +32,20 @@ UPrototypeItemGenerator::UPrototypeItemGenerator()
 	if (IsValid(ItemAffixDataTableClass.Object))
 	{
 		ItemAffixDataTable = ItemAffixDataTableClass.Object;
+
+		const FString Context;
+		ItemAffixDataTable->GetAllRows<FItemAffix>(Context, ItemAffixes);
+		// TODO: 접두사, 접미어를 구분해서 TArray에 넣는다.
+		for (int i = 0; i < ItemAffixes.Num(); i++)
+		{
+
+		}
+	}
+
+	static ConstructorHelpers::FObjectFinder<UAttributeGameplayEffectMap> AttributeMap(TEXT("/Game/Prototype/Data/DA_AttributeGameplayEffectMap.DA_AttributeGameplayEffectMap"));
+	if (IsValid(AttributeMap.Object))
+	{
+		ItemAffixAttributes = AttributeMap.Object;
 	}
 }
 
@@ -388,9 +403,24 @@ void UPrototypeItemGenerator::RollItemAffixes(TObjectPtr<UPrototypeItem> Item)
 			}
 		}
 	}
-	
 	UE_LOG(LogTemp, Warning, TEXT("Roll Item Affix: MaxAffixCount(%d), PrefixCount(%d), SuffixCount(%d)"), MaxAffixCount, PrefixCount, SuffixCount);
 
+	// TODO: 접두사와 접미사를 갯수에 맞게 넣는다.
+	for (int i = 0; i < MaxAffixCount; i++)
+	{
+	}
+
+	// 테스트 코드
+	Item->AddAffix(ItemAffixes[0]);
+	auto Affix = ItemAffixes[0];
+	if (Affix)
+	{
+		auto Modifier = Affix->AffixModifiers[0];
+		auto Tag = Modifier.Attribute;
+		auto GameplayEffect = ItemAffixAttributes->GetGameplayEffectByAttributeTag(Tag);
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *GameplayEffect->GetName());
+		// GameplayEffect->
+	}
 }
 
 TObjectPtr<UPrototypeItem> UPrototypeItemGenerator::GenerateItem_Gold(int32 MonsterLevel)

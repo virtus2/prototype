@@ -39,7 +39,6 @@ protected:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-
 	virtual void InitAbilityActorInfo();
 	// Initialize the Character's attributes. Must run on Server but we run it on Client too
 	// so that we don't have to wait. The Server's replication to the Client won't matter since
@@ -50,7 +49,6 @@ protected:
 	virtual void AddCharacterAbilities();
 
 	virtual void AddStartupEffects();
-
 
 
 	

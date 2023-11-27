@@ -5,7 +5,9 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 
+#include "ThirdPerson/Ability/AttributeGameplayEffectMap.h"
 #include "ThirdPerson/Data/TreasureClass.h"
+#include "ThirdPerson/Data/ItemAffix.h"
 
 #include "PrototypeItemGenerator.generated.h"
 
@@ -38,15 +40,23 @@ private:
 protected:
 
 private:
+	UPROPERTY()
+	TObjectPtr<UAttributeGameplayEffectMap> ItemAffixAttributes;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Prototype")
+	UPROPERTY()
 	TObjectPtr<UDataTable> TreasureClassDataTable;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Prototype")
+	UPROPERTY()
 	TObjectPtr<UDataTable> ItemTypeDataTable;
 
-	UPROPERTY(EditDefaultsOnly, Category="Prototype")
+	UPROPERTY()
 	TObjectPtr<UDataTable> ItemAffixDataTable;
+
+	TArray<FItemAffix*> ItemAffixes;
+
+	TArray<FItemAffix*> ItemPrefixes;
+
+	TArray<FItemAffix*> ItemSuffixes;
 	
 
 	/*

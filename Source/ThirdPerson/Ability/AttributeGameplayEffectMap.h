@@ -20,6 +20,9 @@ class THIRDPERSON_API UAttributeGameplayEffectMap : public UDataAsset
 	* 따라서 Attribute마다 하나씩 GameplayEffect를 만들고, 여기에 캐싱해놓고 사용한다.
 	*/
 public:
+	TSubclassOf<UGameplayEffect> GetGameplayEffectByAttributeTag(FGameplayTag AttributeTag);
+
+public:
 	UPROPERTY(EditDefaultsOnly, Category = "Gameplay Abilities", meta = (TitleProperty = Ability))
 	TMap<FGameplayTag, TSubclassOf<UGameplayEffect>> AttributeToGameplayEffect;
 	
