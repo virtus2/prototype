@@ -24,8 +24,6 @@ public:
 
 	virtual void DebugLog();
 
-	void AddAffix(FItemAffix* ItemAffix);
-
 protected:
 
 private:
@@ -54,7 +52,7 @@ protected:
 
 private:
 
-	UPROPERTY(VisibleAnywhere)
-	TArray<FItemAffix*> ItemAffixes;
+	// UPROPERTY(VisibleAnywhere)
+	// TArray<FItemAffix*> ItemAffixes;
 	
 };

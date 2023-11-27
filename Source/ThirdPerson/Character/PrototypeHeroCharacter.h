@@ -24,6 +24,8 @@ class THIRDPERSON_API APrototypeHeroCharacter : public APrototypeCharacterBase
 
 public:
 	APrototypeHeroCharacter(const class FObjectInitializer& ObjectInitializer);
+
+    void ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass) const;
 	
 protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

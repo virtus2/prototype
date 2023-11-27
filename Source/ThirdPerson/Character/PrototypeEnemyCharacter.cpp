@@ -58,6 +58,7 @@ void APrototypeEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// TEST: 몬스터 아이템 드랍 코드
 	SpawnTreasure();
 }
 

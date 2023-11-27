@@ -13,6 +13,9 @@
 #include "ThirdPerson/Data/ItemType.h"
 #include "ThirdPerson/Item/PrototypeItem.h"
 #include "ThirdPerson/Game/PrototypeGameModeBase.h"
+#include "ThirdPerson/Character/PrototypeHeroCharacter.h"
+#include "ThirdPerson/Player/PrototypePlayerState.h"
+#include "ThirdPerson/Ability/PrototypeAbilitySystemComponent.h"
 
 UPrototypeItemGenerator::UPrototypeItemGenerator()
 {
@@ -411,7 +414,7 @@ void UPrototypeItemGenerator::RollItemAffixes(TObjectPtr<UPrototypeItem> Item)
 	}
 
 	// 테스트 코드
-	Item->AddAffix(ItemAffixes[0]);
+	// Item->AddAffix(ItemAffixes[0]);
 	auto Affix = ItemAffixes[0];
 	if (Affix)
 	{
@@ -419,7 +422,14 @@ void UPrototypeItemGenerator::RollItemAffixes(TObjectPtr<UPrototypeItem> Item)
 		auto Tag = Modifier.Attribute;
 		auto GameplayEffect = ItemAffixAttributes->GetGameplayEffectByAttributeTag(Tag);
 		UE_LOG(LogTemp, Warning, TEXT("%s"), *GameplayEffect->GetName());
-		// GameplayEffect->
+		
+		auto PC = GetWorld()->GetFirstPlayerController();
+		auto PS = PC->GetPlayerState<APrototypePlayerState>();
+		auto ASC = PS->GetAbilitySystemComponent();
+		auto EffectContext = ASC->MakeEffectContext();
+		const FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(GameplayEffect, 1, EffectContext);
+		SpecHandle.Data.Get()->SetSetByCallerMagnitude(Tag, Modifier.MinValue);
+		ASC->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), ASC);
 	}
 }
 

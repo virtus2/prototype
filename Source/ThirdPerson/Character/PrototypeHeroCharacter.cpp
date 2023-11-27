@@ -8,6 +8,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "Camera/CameraComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Kismet/GameplayStatics.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
@@ -17,6 +18,9 @@
 #include "ThirdPerson/Ability/PrototypeAttributeSet.h"
 #include "ThirdPerson/Ability/PrototypeAbilitySystemComponent.h"
 #include "ThirdPerson/Input/PrototypeEnhancedInputComponent.h"
+
+#include "ThirdPerson/Item/PrototypeItemGenerator.h"
+#include "ThirdPerson/Game/PrototypeGameModeBase.h"
 
 APrototypeHeroCharacter::APrototypeHeroCharacter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -34,6 +38,15 @@ APrototypeHeroCharacter::APrototypeHeroCharacter(const FObjectInitializer& Objec
     GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 
     Inventory = CreateDefaultSubobject<UPrototypeInventoryComponent>(TEXT("Inventory"));
+}
+
+void APrototypeHeroCharacter::ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass) const
+{
+    FGameplayEffectContextHandle ContextHandle = AbilitySystemComponent->MakeEffectContext();
+    ContextHandle.AddSourceObject(this);
+
+    const FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(GameplayEffectClass, 1, ContextHandle);
+    AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), AbilitySystemComponent.Get());
 }
 
 void APrototypeHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

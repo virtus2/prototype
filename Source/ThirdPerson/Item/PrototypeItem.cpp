@@ -25,15 +25,3 @@ void UPrototypeItem::DebugLog()
 		*Rarity.ToString()
 	);
 }
-
-void UPrototypeItem::AddAffix(FItemAffix* ItemAffix)
-{
-	auto Affix = ItemAffixes[0];
-	if (Affix)
-	{
-		auto Modifier = Affix->AffixModifiers[0];
-		auto Tag = Modifier.Attribute;
-		auto GameplayEffect = ItemAffixAttributes->GetGameplayEffectByAttributeTag(Tag);
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *GameplayEffect->GetName());
-	}
-}
