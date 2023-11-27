@@ -337,13 +337,56 @@ void UPrototypeItemGenerator::RollItemAffixes(TObjectPtr<UPrototypeItem> Item)
 	if (Item->Rarity == TAG_Item_Rarity_Rare)
 	{
 		// 레어 아이템은 접사가 최소 3개, 최대 6개
-		PrefixCount = FMath::RandRange(1, 3);
-		SuffixCount = FMath::RandRange(1, 6 - PrefixCount);
+		// 접두사 최대 3개, 접미사 최대 3개
+		MaxAffixCount = FMath::RandRange(3, 6);
+		for (int i = 0; i < MaxAffixCount; i++)
+		{
+			if (PrefixCount == 3)
+			{
+				SuffixCount++;
+				continue;
+			}
+			else if (SuffixCount == 3)
+			{
+				PrefixCount++;
+				continue;
+			}
+
+			if (FMath::RandBool())
+			{
+				PrefixCount++;
+			}
+			else
+			{
+				SuffixCount++;
+			}
+		}
 	}
 	else if (Item->Rarity == TAG_Item_Rarity_Magic)
 	{
-		PrefixCount = FMath::RandRange(0, 1);
-		SuffixCount = FMath::RandRange(0, 2 - PrefixCount);
+		MaxAffixCount = FMath::RandRange(1, 3);
+		for (int i = 0; i < MaxAffixCount; i++)
+		{
+			if (PrefixCount == 2)
+			{
+				SuffixCount++;
+				continue;
+			}
+			else if (SuffixCount == 2)
+			{
+				PrefixCount++;
+				continue;
+			}
+
+			if (FMath::RandBool())
+			{
+				PrefixCount++;
+			}
+			else
+			{
+				SuffixCount++;
+			}
+		}
 	}
 	
 	UE_LOG(LogTemp, Warning, TEXT("Roll Item Affix: MaxAffixCount(%d), PrefixCount(%d), SuffixCount(%d)"), MaxAffixCount, PrefixCount, SuffixCount);
