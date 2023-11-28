@@ -5,6 +5,7 @@
 
 #include "Net/UnrealNetwork.h"
 
+#include "ThirdPerson/UI/PrototypeHUDWidget.h"
 #include "ThirdPerson/Character/PrototypeHeroCharacter.h"
 #include "ThirdPerson/Player/PrototypePlayerController.h"
 #include "ThirdPerson/Ability/PrototypeAbilitySystemComponent.h"
@@ -69,7 +70,15 @@ void APrototypePlayerState::HealthChanged(const FOnAttributeChangeData& Data)
         return;
     }
 
-    // TODO: Update the HUD
+    auto PC = GetPrototypePlayerController();
+    if (IsValid(PC))
+    {
+        auto HUD = PC->GetHUD();
+        if (HUD)
+        {
+            HUD->SetCurrentHealth(Health);
+        }
+    }
     UE_LOG(LogTemp, Warning, TEXT("HealthChanged - NewValue: %f, OldValue: %f"), Data.NewValue, Data.OldValue);
 }
 
@@ -83,7 +92,15 @@ void APrototypePlayerState::MaxHealthChanged(const FOnAttributeChangeData& Data)
         return;
     }
 
-    // TODO: Update the HUD
+    auto PC = GetPrototypePlayerController();
+    if (IsValid(PC))
+    {
+        auto HUD = PC->GetHUD();
+        if (HUD)
+        {
+            HUD->SetMaxHealth(MaxHealth);
+        }
+    }
     UE_LOG(LogTemp, Warning, TEXT("MaxHealthChanged - NewValue: %f, OldValue: %f"), Data.NewValue, Data.OldValue);
 }
 
@@ -97,7 +114,15 @@ void APrototypePlayerState::ManaChanged(const FOnAttributeChangeData& Data)
         return;
     }
 
-    // TODO: Update the HUD
+    auto PC = GetPrototypePlayerController();
+    if (IsValid(PC))
+    {
+        auto HUD = PC->GetHUD();
+        if (HUD)
+        {
+            HUD->SetCurrentMana(Mana);
+        }
+    }
     UE_LOG(LogTemp, Warning, TEXT("ManaChanged - NewValue: %f, OldValue: %f"), Data.NewValue, Data.OldValue);
 }
 void APrototypePlayerState::MaxManaChanged(const FOnAttributeChangeData& Data)
@@ -110,7 +135,15 @@ void APrototypePlayerState::MaxManaChanged(const FOnAttributeChangeData& Data)
         return;
     }
 
-    // TODO: Update the HUD
+    auto PC = GetPrototypePlayerController();
+    if (IsValid(PC))
+    {
+        auto HUD = PC->GetHUD();
+        if (HUD)
+        {
+            HUD->SetMaxMana(MaxMana);
+        }
+    }
     UE_LOG(LogTemp, Warning, TEXT("MaxManaChanged - NewValue: %f, OldValue: %f"), Data.NewValue, Data.OldValue);
 }
 
@@ -121,6 +154,9 @@ void APrototypePlayerState::BeginPlay()
     if (AbilitySystemComponent)
     {
         HealthChangedDelegateHandle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetHealthAttribute()).AddUObject(this, &APrototypePlayerState::HealthChanged);
+        MaxHealthChangedDelegateHandle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetMaxHealthAttribute()).AddUObject(this, &APrototypePlayerState::MaxHealthChanged);
+        ManaChangedDelegateHandle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetManaAttribute()).AddUObject(this, &APrototypePlayerState::ManaChanged);
+        MaxManaChangedDelegateHandle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetMaxManaAttribute()).AddUObject(this, &APrototypePlayerState::MaxManaChanged);
     }
 }
 

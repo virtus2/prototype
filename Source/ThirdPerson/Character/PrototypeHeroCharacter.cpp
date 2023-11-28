@@ -138,6 +138,16 @@ void APrototypeHeroCharacter::Move(const FInputActionValue& Value)
     FRotator ForwardRotation = FRotator(0.0f, CharacterRotation.Yaw, 0.0f);
     FVector ForwardDirection = UKismetMathLibrary::GetForwardVector(ForwardRotation);
     AddMovementInput(ForwardDirection, AxisValues.Y);
+
+    /* TEST: 플레이어 아이템 드랍 테스트  */
+    /*
+    const TObjectPtr<APrototypeGameModeBase> GameMode = Cast<APrototypeGameModeBase>(UGameplayStatics::GetGameMode(this));
+    if (!IsValid(GameMode))
+    {
+        return;
+    }
+    const auto& PickedItems = GameMode->ItemGenerator->GenerateItems(FGameplayTag::RequestGameplayTag("Item.Treasure.All_Equipment"), 30);
+    */
 }
 
 void APrototypeHeroCharacter::Look(const FInputActionValue& Value)

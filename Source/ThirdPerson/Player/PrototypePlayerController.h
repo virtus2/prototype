@@ -6,8 +6,8 @@
 #include "GameFramework/PlayerController.h"
 #include "PrototypePlayerController.generated.h"
 
-class UPrototypeHUDWidget;
 struct FGameplayTag;
+class UPrototypeHUDWidget;
 
 UCLASS()
 class THIRDPERSON_API APrototypePlayerController : public APlayerController
@@ -16,6 +16,9 @@ class THIRDPERSON_API APrototypePlayerController : public APlayerController
 	
 public:
 	void CreateHUD();
+	
+	TObjectPtr<UPrototypeHUDWidget> GetHUD();
+
 	
 protected:
 	// Server Only

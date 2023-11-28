@@ -35,6 +35,11 @@ void APrototypePlayerController::CreateHUD()
 	PrototypeHUDWidget->SetCurrentMana(PS->GetMana());
 }
 
+TObjectPtr<UPrototypeHUDWidget> APrototypePlayerController::GetHUD()
+{
+	return PrototypeHUDWidget;
+}
+
 void APrototypePlayerController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);

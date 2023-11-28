@@ -44,7 +44,7 @@ void UPrototypeAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModC
 	if (Data.EvaluatedData.Attribute == GetMaxHealthAttribute())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("PostGameplayEffectExecute MaxHealth"));
-
+		SetMaxHealth(FMath::Max(GetMaxHealth(), 0.0f));
 	}
 	else if (Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
@@ -55,12 +55,13 @@ void UPrototypeAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModC
 	{
 		UE_LOG(LogTemp, Warning, TEXT("PostGameplayEffectExecute MaxMana %f"),
 			Data.EvaluatedData.Magnitude);
+		SetMaxMana(FMath::Max(GetMaxMana(), 0.0f));
 	}
 	else if (Data.EvaluatedData.Attribute == GetManaAttribute())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("PostGameplayEffectExecute Mana %f"),
 			Data.EvaluatedData.Magnitude);
-		SetHealth(FMath::Max(GetMana(), 0.0f));
+		SetMana(FMath::Max(GetMana(), 0.0f));
 	}
 }
 
