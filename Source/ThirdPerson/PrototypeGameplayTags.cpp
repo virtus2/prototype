@@ -3,6 +3,12 @@
 
 #include "PrototypeGameplayTags.h"
 
+UE_DEFINE_GAMEPLAY_TAG(TAG_Item_Affix, "Item.Affix")
+UE_DEFINE_GAMEPLAY_TAG(TAG_Item_Affix_Group, "Item.Affix.Group")
+UE_DEFINE_GAMEPLAY_TAG(TAG_Item_Affix_Type, "Item.Affix.Type")
+UE_DEFINE_GAMEPLAY_TAG(TAG_Item_Affix_Type_Prefix, "Item.Affix.Type.Prefix")
+UE_DEFINE_GAMEPLAY_TAG(TAG_Item_Affix_Type_Suffix, "Item.Affix.Type.Suffix")
+
 UE_DEFINE_GAMEPLAY_TAG(TAG_Item_Rarity, "Item.Rarity")
 UE_DEFINE_GAMEPLAY_TAG(TAG_Item_Rarity_Unique, "Item.Rarity.Unique")
 UE_DEFINE_GAMEPLAY_TAG(TAG_Item_Rarity_Set, "Item.Rarity.Set")

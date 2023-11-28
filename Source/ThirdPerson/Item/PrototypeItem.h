@@ -47,12 +47,12 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	int32 ItemStackAmount;
 
+	TArray<FItemAffix*> ItemAffixes;
+
 protected:
 	
 
 private:
 
-	// UPROPERTY(VisibleAnywhere)
-	// TArray<FItemAffix*> ItemAffixes;
 	
 };

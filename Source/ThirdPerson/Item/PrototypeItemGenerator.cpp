@@ -39,9 +39,17 @@ UPrototypeItemGenerator::UPrototypeItemGenerator()
 		const FString Context;
 		ItemAffixDataTable->GetAllRows<FItemAffix>(Context, ItemAffixes);
 		// TODO: 접두사, 접미어를 구분해서 TArray에 넣는다.
-		for (int i = 0; i < ItemAffixes.Num(); i++)
+		for(auto& Affix : ItemAffixes)
 		{
-
+			FGameplayTag AffixType = Affix->AffixType;
+			if (AffixType.MatchesTagExact(TAG_Item_Affix_Type_Prefix))
+			{
+				ItemPrefixes.Add(Affix);
+			}
+			else if (AffixType.MatchesTagExact(TAG_Item_Affix_Type_Suffix))
+			{
+				ItemSuffixes.Add(Affix);
+			}
 		}
 	}
 
@@ -408,13 +416,70 @@ void UPrototypeItemGenerator::RollItemAffixes(TObjectPtr<UPrototypeItem> Item)
 	}
 	UE_LOG(LogTemp, Warning, TEXT("Roll Item Affix: MaxAffixCount(%d), PrefixCount(%d), SuffixCount(%d)"), MaxAffixCount, PrefixCount, SuffixCount);
 
-	// TODO: 접두사와 접미사를 갯수에 맞게 넣는다.
-	for (int i = 0; i < MaxAffixCount; i++)
+	// TODO: 이미 들어가있는 접사는 빼고 나머지에서 넣어야한다...
+	// 접두사를 넣는다.
+	for (int i = 0; i < PrefixCount; i++)
 	{
+		int64 TotalFreq = 0;
+		TArray<FItemAffix*> SpawnablePrefixes;
+		// TODO: 아이템 타입마다 미리 캐싱해놓는것도 괜찮을듯...?
+		for (auto& Prefix : ItemPrefixes)
+		{
+			if (Prefix->AppearOnItemType.HasTagExact(Item->ItemType))
+			{
+				SpawnablePrefixes.Add(Prefix);
+				TotalFreq += Prefix->Frequency;
+			}
+		}
+		int64 RandomFreq = FMath::RandRange(0LL, TotalFreq);
+		int64 RandomFreqSum = 0;
+		for (auto& Prefix : SpawnablePrefixes)
+		{
+			RandomFreqSum += Prefix->Frequency;
+			if (RandomFreqSum >= RandomFreq)
+			{
+				Item->ItemAffixes.Add(Prefix);
+				break;
+			}
+		}
 	}
 
-	// 테스트 코드
-	// Item->AddAffix(ItemAffixes[0]);
+	// 접미사를 넣는다.
+	for (int i = 0; i < SuffixCount; i++)
+	{
+		int64 TotalFreq = 0;
+		TArray<FItemAffix*> SpawnableSuffixes;
+		// TODO: 아이템 타입마다 미리 캐싱해놓는것도 괜찮을듯...?
+		for (auto& Suffix : ItemSuffixes)
+		{
+			if (Suffix->AppearOnItemType.HasTagExact(Item->ItemType))
+			{
+				SpawnableSuffixes.Add(Suffix);
+				TotalFreq += Suffix->Frequency;
+			}
+		}
+		int64 RandomFreq = FMath::RandRange(0LL, TotalFreq);
+		int64 RandomFreqSum = 0;
+		for (auto& Suffix : SpawnableSuffixes)
+		{
+			RandomFreqSum += Suffix->Frequency;
+			if (RandomFreqSum >= RandomFreq)
+			{
+				Item->ItemAffixes.Add(Suffix);
+				break;
+			}
+		}
+	}
+
+	for (auto& Affix : Item->ItemAffixes)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Item Affix Added: %s"), *(Affix->InGameName));
+	}
+
+
+	// TEST: 아이템 능력치 적용 테스트 코드
+	// 
+	/*
 	auto Affix = ItemAffixes[0];
 	if (Affix)
 	{
@@ -431,6 +496,7 @@ void UPrototypeItemGenerator::RollItemAffixes(TObjectPtr<UPrototypeItem> Item)
 		SpecHandle.Data.Get()->SetSetByCallerMagnitude(Tag, Modifier.MinValue);
 		ASC->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), ASC);
 	}
+	*/
 }
 
 TObjectPtr<UPrototypeItem> UPrototypeItemGenerator::GenerateItem_Gold(int32 MonsterLevel)

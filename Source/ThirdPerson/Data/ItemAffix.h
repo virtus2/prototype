@@ -24,6 +24,9 @@ USTRUCT(BlueprintType)
 struct FItemAffix : public FTableRowBase
 {
     GENERATED_BODY()
+    
+    UPROPERTY(EditAnywhere)
+    FString InGameName;
 
     UPROPERTY(EditAnywhere)
     bool bOnlySpawnRare;
@@ -39,10 +42,16 @@ struct FItemAffix : public FTableRowBase
 
     UPROPERTY(EditAnywhere)
     int32 Frequency;
+
+    UPROPERTY(EditAnywhere, meta = (Categories = "Item.Affix.Type"))
+    FGameplayTag AffixType;
  
-    UPROPERTY(EditAnywhere, meta = (Categories = "Item.Affix"))
+    UPROPERTY(EditAnywhere, meta = (Categories = "Item.Affix.Group"))
     FGameplayTag AffixGroup;
 
     UPROPERTY(EditAnywhere)
     TArray<FAttributeModifier> AffixModifiers;
+
+    UPROPERTY(EditAnywhere, meta=(Categories="Item.Type"))
+    FGameplayTagContainer AppearOnItemType;
 };

@@ -49,9 +49,9 @@ struct FTreasureClass : public FTableRowBase
     UPROPERTY(EditAnywhere)
     int32 FreqNoDrop;
 
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, meta=(ForceInlineRow))
     TMap<FGameplayTag, int32> FreqRarities;
 
-    UPROPERTY(EditAnywhere, meta=(TitleProperty="{Treasure}가 {Probability}의 비율로 생성"))
+    UPROPERTY(EditAnywhere, meta=(ShowOnlyInnerProperties, TitleProperty="{Treasure}가 {Probability}의 비율로 생성"))
     TArray<FTreasure> Treasures;
 };
