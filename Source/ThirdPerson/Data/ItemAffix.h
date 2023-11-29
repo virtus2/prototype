@@ -53,5 +53,5 @@ struct FItemAffix : public FTableRowBase
     TArray<FAttributeModifier> AffixModifiers;
 
     UPROPERTY(EditAnywhere, meta=(Categories="Item.Type"))
-    FGameplayTagContainer AppearOnItemType;
+    FGameplayTagContainer SpawnableItemTypes;
 };

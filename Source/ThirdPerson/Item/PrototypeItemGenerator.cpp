@@ -425,12 +425,13 @@ void UPrototypeItemGenerator::RollItemAffixes(TObjectPtr<UPrototypeItem> Item)
 		// TODO: 아이템 타입마다 미리 캐싱해놓는것도 괜찮을듯...?
 		for (auto& Prefix : ItemPrefixes)
 		{
-			if (Prefix->AppearOnItemType.HasTagExact(Item->ItemType))
+			if (Prefix->SpawnableItemTypes.HasTagExact(Item->ItemType) && !Item->PrefixGroupTags.HasTag(Prefix->AffixGroup))
 			{
 				SpawnablePrefixes.Add(Prefix);
 				TotalFreq += Prefix->Frequency;
 			}
 		}
+
 		int64 RandomFreq = FMath::RandRange(0LL, TotalFreq);
 		int64 RandomFreqSum = 0;
 		for (auto& Prefix : SpawnablePrefixes)
@@ -439,6 +440,7 @@ void UPrototypeItemGenerator::RollItemAffixes(TObjectPtr<UPrototypeItem> Item)
 			if (RandomFreqSum >= RandomFreq)
 			{
 				Item->ItemAffixes.Add(Prefix);
+				Item->PrefixGroupTags.AddTag(Prefix->AffixGroup);
 				break;
 			}
 		}
@@ -452,7 +454,7 @@ void UPrototypeItemGenerator::RollItemAffixes(TObjectPtr<UPrototypeItem> Item)
 		// TODO: 아이템 타입마다 미리 캐싱해놓는것도 괜찮을듯...?
 		for (auto& Suffix : ItemSuffixes)
 		{
-			if (Suffix->AppearOnItemType.HasTagExact(Item->ItemType))
+			if (Suffix->SpawnableItemTypes.HasTagExact(Item->ItemType) && !Item->SuffixGroupTags.HasTag(Suffix->AffixGroup))
 			{
 				SpawnableSuffixes.Add(Suffix);
 				TotalFreq += Suffix->Frequency;
@@ -466,6 +468,7 @@ void UPrototypeItemGenerator::RollItemAffixes(TObjectPtr<UPrototypeItem> Item)
 			if (RandomFreqSum >= RandomFreq)
 			{
 				Item->ItemAffixes.Add(Suffix);
+				Item->SuffixGroupTags.AddTag(Suffix->AffixGroup);
 				break;
 			}
 		}

@@ -48,7 +48,8 @@ public:
 	int32 ItemStackAmount;
 
 	TArray<FItemAffix*> ItemAffixes;
-
+	FGameplayTagContainer PrefixGroupTags;
+	FGameplayTagContainer SuffixGroupTags;
 protected:
 	
 
