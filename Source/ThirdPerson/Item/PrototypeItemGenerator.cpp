@@ -258,9 +258,9 @@ FGameplayTag UPrototypeItemGenerator::RollItemRarity(FGameplayTag Rarity, int32 
 		return TAG_Item_Rarity_Normal;
 	}
 
-	int32 Quality;
-	int32 Divisor;
-	float MagicFindConstant;
+	int32 Quality = 1024;
+	int32 Divisor = 1024;
+	float MagicFindConstant = 1024.0f;
 	if (bIsClassSpecific)
 	{
 		if (Rarity.MatchesTag(TAG_Item_Rarity_Unique))
@@ -356,11 +356,20 @@ FGameplayTag UPrototypeItemGenerator::RollItemRarity(FGameplayTag Rarity, int32 
 
 void UPrototypeItemGenerator::RollItemAffixes(TObjectPtr<UPrototypeItem> Item)
 {
+	// 지금은 Item에 대한 Rarity, Level이 다 정해져있다고 가정하고 Item을 매개변수로 받는데, 이렇게 하면 먼저 Rarity, Level을 정해야하므로 종속성이 생겨버림.
+	// TODO: Item의 Rarity, Level 등 데이터 종속성을 없애도록 리팩토링
+	// FGameplayTagContainer ItemPrefixGroupTags = Item->PrefixGroupTags; // Item클래스에 PrefixGroupTags.HasTag() 함수를 만드는게 나을수도 있음
+	// FGameplayTagContainer ItemSuffixGroupTags = Item->SuffixGroupTags;
+	FGameplayTag ItemType = Item->ItemType;
+	FGameplayTag Rarity = Item->Rarity;
+	int32 ItemLevel = Item->ItemLevel;
+	// Item->ItemAffixes;
+
 	// 아이템에 붙을 수 있는 접사 갯수를 결정한다.
 	int32 MaxAffixCount = 0;
 	int32 PrefixCount = 0;
 	int32 SuffixCount = 0;
-	if (Item->Rarity == TAG_Item_Rarity_Rare)
+	if (Rarity == TAG_Item_Rarity_Rare)
 	{
 		// 레어 아이템은 접사가 최소 3개, 최대 6개
 		// 접두사 최대 3개, 접미사 최대 3개
@@ -388,7 +397,7 @@ void UPrototypeItemGenerator::RollItemAffixes(TObjectPtr<UPrototypeItem> Item)
 			}
 		}
 	}
-	else if (Item->Rarity == TAG_Item_Rarity_Magic)
+	else if (Rarity == TAG_Item_Rarity_Magic)
 	{
 		MaxAffixCount = FMath::RandRange(1, 3);
 		for (int i = 0; i < MaxAffixCount; i++)
@@ -425,7 +434,7 @@ void UPrototypeItemGenerator::RollItemAffixes(TObjectPtr<UPrototypeItem> Item)
 		// TODO: 아이템 타입마다 미리 캐싱해놓는것도 괜찮을듯...?
 		for (auto& Prefix : ItemPrefixes)
 		{
-			if (Prefix->SpawnableItemTypes.HasTagExact(Item->ItemType) && !Item->PrefixGroupTags.HasTag(Prefix->AffixGroup))
+			if (Prefix->SpawnableItemTypes.HasTagExact(ItemType) && !Item->PrefixGroupTags.HasTag(Prefix->AffixGroup))
 			{
 				SpawnablePrefixes.Add(Prefix);
 				TotalFreq += Prefix->Frequency;
