@@ -23,8 +23,10 @@ public:
 	UPrototypeItem();
 
 	virtual void DebugLog();
+	bool HasAffixGroupTag(FGameplayTag AffixType, FGameplayTag AffixGroup);
 
 protected:
+	
 
 private:
 
@@ -48,8 +50,10 @@ public:
 	int32 ItemStackAmount;
 
 	TArray<FItemAffix*> ItemAffixes;
-	FGameplayTagContainer PrefixGroupTags;
-	FGameplayTagContainer SuffixGroupTags;
+
+	// Key: Item.Affix.Type.XXX
+	// Value: Item.Affix.Group.XXX
+	TMap<FGameplayTag, FGameplayTagContainer> AffixGroupTagMap;
 protected:
 	
 

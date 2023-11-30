@@ -21,21 +21,23 @@ class THIRDPERSON_API UPrototypeItemGenerator : public UObject
 public:	
 	UPrototypeItemGenerator();
 
-	TArray<TObjectPtr<UPrototypeItem>> GenerateItems(FGameplayTag TreasureClass, int32 MonsterLevel);
+	void GenerateItems(FGameplayTag TreasureClass, int32 MonsterLevel);
 protected:
 
 private:
-	TArray<TObjectPtr<UPrototypeItem>> RollTreasureClassPicks(FGameplayTag TreasureClassTag, int32 MonsterLevel);
+	TArray<FGameplayTag> RollTreasureClassPicks(FTreasureClass* TreasureClass, int32 MonsterLevel);
 
-	TObjectPtr<UPrototypeItem> PickItem(FGameplayTag ItemType, int32 MonsterLevel, FTreasureClass* TreasureClass);
-	TObjectPtr<UPrototypeItem> PickItem_Equipment(FGameplayTag ItemType, int32 MonsterLevel, FTreasureClass* TreasureClass);
-	TObjectPtr<UPrototypeItem> PickItem_Gold(int32 MonsterLevel);
+	FGameplayTag PickItemType(FGameplayTag ItemType, int32 MonsterLevel);
+    FGameplayTag PickItemType_Equipment(FGameplayTag ItemType);
 
-	TObjectPtr<UPrototypeItem> GenerateItem_Equipment(FGameplayTag ItemType, int32 MonsterLevel, FTreasureClass* TreasureClass);
-	FGameplayTag RollItemRarity(FGameplayTag Rarity, int32 MonsterLevel, int32 ItemLevel, FTreasureClass* TreasureClass, bool bIsClassSpecific);
-	void RollItemAffixes(TObjectPtr<UPrototypeItem> Item);
-	
 	TObjectPtr<UPrototypeItem> GenerateItem_Gold(int32 MonsterLevel);
+	TObjectPtr<UPrototypeItem> GenerateItem_Equipment(FGameplayTag ItemType, int32 MonsterLevel, FTreasureClass* TreasureClass, FItemType* ItemTypeData);
+
+	FGameplayTag RollItemRarity(int32 MonsterLevel, int32 ItemLevel, FTreasureClass* TreasureClass, bool bIsClassSpecificItem);
+	bool CheckItemRarityCalc(int32 MonsterLevel, int32 ItemLevel, int32 Quality, int32 Divisor, float MagicFindConst, int32 FreqRarity);
+
+	void RollItemAffixes(TObjectPtr<UPrototypeItem> Item);
+	void AddItemAffixes(TObjectPtr<UPrototypeItem> Item, FGameplayTag AffixType, int32 AffixCount);
 
 protected:
 
@@ -52,11 +54,8 @@ private:
 	UPROPERTY()
 	TObjectPtr<UDataTable> ItemAffixDataTable;
 
-	TArray<FItemAffix*> ItemAffixes;
-
-	TArray<FItemAffix*> ItemPrefixes;
-
-	TArray<FItemAffix*> ItemSuffixes;
+	TArray<FItemAffix*> AllItemAffixes;
+	TMap<FGameplayTag, TArray<FItemAffix*>> ItemAffixMap;
 	
 
 	/*
@@ -65,6 +64,7 @@ private:
 	float MagicFindConstant_Unique = 250.0f;
 	float MagicFindConstant_Set = 500.0f;
 	float MagicFindConstant_Rare = 600.0f;
+	float MagicFindConstant_Magic = 1024.0f;
 
 	/*
 	* Itemratio.txt의 Quality, Divisor

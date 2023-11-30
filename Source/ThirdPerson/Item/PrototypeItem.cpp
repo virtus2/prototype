@@ -24,4 +24,18 @@ void UPrototypeItem::DebugLog()
 		ItemStackAmount,
 		*Rarity.ToString()
 	);
+	for (const auto& Affix : ItemAffixes)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Affix: %s"), *Affix->InGameName);
+	}
+}
+
+bool UPrototypeItem::HasAffixGroupTag(FGameplayTag AffixType, FGameplayTag AffixGroup)
+{
+	auto AffixGroupTagContainer = AffixGroupTagMap.Find(AffixType);
+	if (AffixGroupTagContainer)
+	{
+		return AffixGroupTagContainer->HasTag(AffixGroup);
+	}
+	return false;
 }

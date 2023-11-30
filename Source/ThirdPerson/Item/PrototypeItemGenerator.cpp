@@ -12,6 +12,7 @@
 #include "ThirdPerson/Data/ItemAffix.h"
 #include "ThirdPerson/Data/ItemType.h"
 #include "ThirdPerson/Item/PrototypeItem.h"
+#include "ThirdPerson/Item/PrototypeItemUtil.h"
 #include "ThirdPerson/Game/PrototypeGameModeBase.h"
 #include "ThirdPerson/Character/PrototypeHeroCharacter.h"
 #include "ThirdPerson/Player/PrototypePlayerState.h"
@@ -37,18 +38,20 @@ UPrototypeItemGenerator::UPrototypeItemGenerator()
 		ItemAffixDataTable = ItemAffixDataTableClass.Object;
 
 		const FString Context;
-		ItemAffixDataTable->GetAllRows<FItemAffix>(Context, ItemAffixes);
-		// TODO: 접두사, 접미어를 구분해서 TArray에 넣는다.
-		for(auto& Affix : ItemAffixes)
+		ItemAffixDataTable->GetAllRows<FItemAffix>(Context, AllItemAffixes);
+		// AffixType에 따라 TMap에 Affix를 넣어둔다.
+		for(auto& Affix : AllItemAffixes)
 		{
 			FGameplayTag AffixType = Affix->AffixType;
-			if (AffixType.MatchesTagExact(TAG_Item_Affix_Type_Prefix))
+			if (ItemAffixMap.Contains(AffixType))
 			{
-				ItemPrefixes.Add(Affix);
+				ItemAffixMap[Affix->AffixType].Add(Affix);
 			}
-			else if (AffixType.MatchesTagExact(TAG_Item_Affix_Type_Suffix))
+			else
 			{
-				ItemSuffixes.Add(Affix);
+				TArray<FItemAffix*> AffixArray;
+				ItemAffixMap.Add(Affix->AffixType, AffixArray);
+				ItemAffixMap[Affix->AffixType].Add(Affix);
 			}
 		}
 	}
@@ -60,54 +63,92 @@ UPrototypeItemGenerator::UPrototypeItemGenerator()
 	}
 }
 
-TArray<TObjectPtr<UPrototypeItem>> UPrototypeItemGenerator::GenerateItems(FGameplayTag TreasureClass, int32 MonsterLevel)
+/// <summary>
+/// TreasureClass에 따라 아이템을 랜덤으로 생성한다. 아이템 생성의 가장 최상위 함수.
+/// </summary>
+/// <param name="TreasureClass"></param>
+/// <param name="MonsterLevel"></param>
+/// <returns></returns>
+void UPrototypeItemGenerator::GenerateItems(FGameplayTag TreasureClass, int32 MonsterLevel)
 {
-	const auto& GeneratedItems = RollTreasureClassPicks(TreasureClass, MonsterLevel);
-	UE_LOG(LogTemp, Warning, TEXT("Generated Items for TreasureClass(%s)"), *TreasureClass.ToString());
-	for (const auto& Item : GeneratedItems)
-	{
-		Item->DebugLog();
-	}
-	return GeneratedItems;
-}
-
-TArray<TObjectPtr<UPrototypeItem>> UPrototypeItemGenerator::RollTreasureClassPicks(FGameplayTag TreasureClass, int32 MonsterLevel)
-{
-	TArray<TObjectPtr<UPrototypeItem>> ResultItems;
-	if (!IsValid(TreasureClassDataTable))
-	{
-		UE_LOG(LogTemp, Warning, TEXT("DataTable(TreasureClass) is not valid."));
-		return ResultItems;
-	}
-
 	const FString Context;
 	FTreasureClass* TC = TreasureClassDataTable->FindRow<FTreasureClass>(TreasureClass.GetTagName(), Context);
 	if (TC == nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("TreasureClass데이터 테이블에 (%s)에 해당하는 데이터가 없습니다."), *TreasureClass.ToString());
-		return ResultItems;
+		UE_LOG(LogTemp, Warning, TEXT("DataTable(TreasureClass) FindRow(%s) is failed"), *TreasureClass.ToString());
+		return;
 	}
 
-	TArray<FTreasure> PickedTreasures;
-	// TODO: NumPicks가 음수 일경우 확정적으로 N개를 드랍한다.
-	if (TC->NumPicks < 0)
+	// 1. TC에서 ItemType을 뽑는다.
+	TArray<FGameplayTag> TCPickedItemTypes = RollTreasureClassPicks(TC, MonsterLevel);
+	
+	// 위에서 뽑은 ItemType에 대해서, 하위 ItemType을 랜덤하게 뽑는다.
+	// 예를 들면 Item.Type.Equipment의 하위 태그 중 하나를 뽑는다.
+	TArray<FGameplayTag> PickedItemTypes;
+	for (const auto& ItemType : TCPickedItemTypes)
 	{
+		FGameplayTag PickedItemType = PickItemType(ItemType, MonsterLevel);
+		PickedItemTypes.Add(PickedItemType);
+	}
 
+	// 2. 최종적으로 뽑힌 아이템타입들에 대해서, 아이템을 생성한다.
+	TArray<TObjectPtr<UPrototypeItem>> GeneratedItems;
+	for (const auto& ItemType : PickedItemTypes)
+	{
+		FItemType* ItemTypeData = ItemTypeDataTable->FindRow<FItemType>(ItemType.GetTagName(), Context);
+		if (ItemTypeData == nullptr)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("ItemType데이터 테이블에 (%s)에 해당하는 데이터가 없습니다."), *ItemType.ToString());
+			return;
+		}
+
+		TObjectPtr<UPrototypeItem> Item;
+		if (ItemType.MatchesTag(TAG_Item_Type_Gold))
+		{
+			Item = GenerateItem_Gold(MonsterLevel);
+		}
+		if (ItemType.MatchesTag(TAG_Item_Type_Equipment))
+		{
+			Item = GenerateItem_Equipment(ItemType, MonsterLevel, TC, ItemTypeData);
+		}
+
+		GeneratedItems.Add(Item);
+	}
+
+	// 3. 생성한 아이템을 반환한다.
+	// TODO: 반환을 하던지 매개변수로 참조 받던지 해서 결과를 함수 밖으로 내보낼수있어야됨
+	for (const auto& Item : GeneratedItems)
+	{
+		Item->DebugLog();
+	}
+}
+
+/// <summary>
+/// TC에 따라 드롭할 아이템 타입들을 뽑는다.
+/// TC가 ItemType일 경우 해당 타입을 뽑고, TC일 경우 재귀적으로 호출해서 뽑을 아이템 타입을 찾는다.
+/// https://www.inven.co.kr/board/diablo2/5734/6547의 [첫째, 드랍시킬 아이템의 종류 결정] 참고.
+/// </summary>
+TArray<FGameplayTag> UPrototypeItemGenerator::RollTreasureClassPicks(FTreasureClass* TreasureClass, int32 MonsterLevel)
+{
+	TArray<FTreasure> PickedTreasures;
+	if (TreasureClass->NumPicks < 0)
+	{
+		// TODO: NumPicks가 음수 일경우 확정적으로 N개를 드랍한다.
 	}
 	else
 	{
 		// TreasureClass에서 TC 또는 아이템을 하나 뽑는다.
-		for (int picksLeft = TC->NumPicks; picksLeft > 0; picksLeft--)
+		for (int picksLeft = TreasureClass->NumPicks; picksLeft > 0; picksLeft--)
 		{
-			int ProbTotal = TC->FreqNoDrop;
-			for (const auto& Treasure : TC->Treasures)
+			int ProbTotal = TreasureClass->FreqNoDrop;
+			for (const auto& Treasure : TreasureClass->Treasures)
 			{
 				ProbTotal += Treasure.Probability;
 			}
 
 			int RandomProb = FMath::RandRange(0, ProbTotal);
 			int ProbRollSum = 0;
-			for (const auto& Treasure : TC->Treasures)
+			for (const auto& Treasure : TreasureClass->Treasures)
 			{
 				ProbRollSum += Treasure.Probability;
 				if (ProbRollSum >= RandomProb)
@@ -119,116 +160,133 @@ TArray<TObjectPtr<UPrototypeItem>> UPrototypeItemGenerator::RollTreasureClassPic
 		}
 	}
 
+	TArray<FGameplayTag> PickedItemTypes;
 	for (const auto& Treasure : PickedTreasures)
 	{
-		// TreasureClass가 아닌 아이템 타입일 경우 해당 아이템을 드롭
+		// 태그가 TC가 아닌 ItemType일 경우 해당 타입을 추가
 		if (Treasure.Treasure.MatchesTag(TAG_Item_Type))
 		{
 			FGameplayTag ItemTypeTag = Treasure.Treasure;
-			TObjectPtr<UPrototypeItem> Item = PickItem(ItemTypeTag, MonsterLevel, TC);
-			if (IsValid(Item))
-			{
-				ResultItems.Add(Item);
-			}
+			PickedItemTypes.Add(ItemTypeTag);
 		}
-		// TreasureClass일 경우 해당 TC로 다시 드랍될 아이템을 뽑는다
+		// 태그가 TC일 경우 해당 TC로 다시 ItemType을 뽑는다
 		else if (Treasure.Treasure.MatchesTag(TAG_Item_Treasure))
 		{
 			FGameplayTag TreasureClassTag = Treasure.Treasure;
-			TArray<TObjectPtr<UPrototypeItem>> Items = RollTreasureClassPicks(TreasureClassTag, MonsterLevel);
-			for (const auto& Item : Items)
-			{
-				ResultItems.Add(Item);
-			}
+			TArray<FGameplayTag> ItemTypes = RollTreasureClassPicks(TreasureClass, MonsterLevel);
+			PickedItemTypes.Append(ItemTypes);
 		}
 	}
 
-	return ResultItems;
+	return PickedItemTypes;
 }
 
-TObjectPtr<UPrototypeItem> UPrototypeItemGenerator::PickItem(FGameplayTag ItemType, int32 MonsterLevel, FTreasureClass* TreasureClass)
+/// <summary>
+/// ItemType 태그의 최하위 타입을 하나 뽑는다.
+/// </summary>
+/// <param name="ItemType">: Item.Type.Armor과 같이 하위 타입일 수도 있고, Item.Type.Armor와 같이 상위 타입일 수도 있다.</param>
+FGameplayTag UPrototypeItemGenerator::PickItemType(FGameplayTag ItemType, int32 MonsterLevel)
 {
+	// ItemType이 Equipment와 같이 상위타입이거나, Armor와 같이 하위 타입일경우 최하위 장비 타입을 뽑는다.
 	if (ItemType.MatchesTag(TAG_Item_Type_Equipment))
 	{
-		return PickItem_Equipment(ItemType, MonsterLevel, TreasureClass);
+		return PickItemType_Equipment(ItemType);
 	}
-	
+
+	// ItemType이 골드일 경우는 골드를 뽑는다. 골드는 최하위 타입이라 그대로 반환한다.
 	if (ItemType.MatchesTag(TAG_Item_Type_Gold))
 	{
-		return PickItem_Gold(MonsterLevel);
+		return TAG_Item_Type_Gold;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("아이템 타입(%s)에 해당하는 아이템을 생성할 수 없습니다."), *ItemType.ToString());
-	return nullptr;
+	UE_LOG(LogTemp, Warning, TEXT("ItemType(%s)에 해당하는 최하위 ItemType을 뽑을 수 없습니다."), *ItemType.ToString());
+	return FGameplayTag();
 }
 
-TObjectPtr<UPrototypeItem> UPrototypeItemGenerator::PickItem_Equipment(FGameplayTag ItemType, int32 MonsterLevel, FTreasureClass* TreasureClass)
+/// <summary>
+/// ItemType에 속해있는 태그 중 가장 하위 태그 하나를 찾는다.
+/// </summary>
+/// <param name="ItemType">: Item.Type.Equipment 또는 Item.Type.Equipment.XXX </param>
+FGameplayTag UPrototypeItemGenerator::PickItemType_Equipment(FGameplayTag ItemType)
 {
 	// 장비의 최상단 타입인 Equipment일 경우, 하위 타입 중 하나를 랜덤으로 다시 뽑는다.
+	// 예를 들면,
+	// Item.Type.Equipment
+	// - Item.Type.Equipment.Weapon
+	// - Item.Type.Equipment.Armor
+	// => Weapon, Armor 중 하나를 뽑는다.
 	if (ItemType.MatchesTagExact(TAG_Item_Type_Equipment))
 	{
 		auto TagNode = UGameplayTagsManager::Get().FindTagNode(ItemType);
 		auto ChildTagNodes = TagNode->GetChildTagNodes();
 		int RandomIndex = FMath::RandRange(0, ChildTagNodes.Num() - 1);
 		FGameplayTag PickedType = ChildTagNodes[RandomIndex].Get()->GetCompleteTag();
-		return PickItem_Equipment(PickedType, MonsterLevel, TreasureClass);
+		return PickItemType_Equipment(PickedType);
 	}
-	
-	// 제네릭 타입 중에서 한 가지 아이템 타입을 뽑는다.
-	FGameplayTagContainer PickedItems;
+
+	// 상위 타입 중에서 한 가지 최하위 ItemType을 뽑는다.
+	// 예를 들면 
+	// - Item.Type.Equipment.Armor 
+	// -- Item.Type.Equipment.Armor.Helmet
+	// -- Item.Type.Equipment.Armor.BodyArmor
+	// => Helmet, BodyArmor 중 하나를 뽑는다.
+	// 
+	// - Item.Type.Equipment.Weapon
+	// -- Item.Type.Equipment.Weapon.Sword
+	// -- Item.Type.Equipment.Weapon.Axe
+	// => Sword, Axe 중 하나를 뽑는다.
+	FGameplayTagContainer PickedItemTypes;
 	if (ItemType.MatchesTagExact(TAG_Item_Type_Equipment_Armor))
 	{
-		PickedItems = UGameplayTagsManager::Get().RequestGameplayTagChildren(TAG_Item_Type_Equipment_Armor);
+		PickedItemTypes = UGameplayTagsManager::Get().RequestGameplayTagChildren(TAG_Item_Type_Equipment_Armor);
 	}
 	else if (ItemType.MatchesTagExact(TAG_Item_Type_Equipment_Weapon))
 	{
-		PickedItems = UGameplayTagsManager::Get().RequestGameplayTagChildren(TAG_Item_Type_Equipment_Weapon);
+		PickedItemTypes = UGameplayTagsManager::Get().RequestGameplayTagChildren(TAG_Item_Type_Equipment_Weapon);
 	}
 
-	// TODO: 아이템 타입마다 가중치를 준다. ItemType.txt
+	// TODO: 1 아이템 타입마다 가중치를 준다. ItemType.txt
 	// 예를들면 디아블로2는 특정 클래스 전용 아이템은 가중치가 1, 일반 아이템은 가중치가 3이다
-	int RandomIndex = FMath::RandRange(0, PickedItems.Num() - 1);
-	FGameplayTag PickedItem = PickedItems.GetByIndex(RandomIndex);
-	
-	return GenerateItem_Equipment(PickedItem, MonsterLevel, TreasureClass);
+	int RandomIndex = FMath::RandRange(0, PickedItemTypes.Num() - 1);
+	FGameplayTag PickedItemType = PickedItemTypes.GetByIndex(RandomIndex);
+	return PickedItemType;
 }
 
-TObjectPtr<UPrototypeItem> UPrototypeItemGenerator::PickItem_Gold(int32 MonsterLevel)
+TObjectPtr<UPrototypeItem> UPrototypeItemGenerator::GenerateItem_Gold(int32 MonsterLevel)
 {
-	return GenerateItem_Gold(MonsterLevel);
+	// TODO: 2 골드 획득 배수를 데이터 테이블로 옮긴다.
+	// TODO: 1 정예몬스터면 골드 드랍양이 x배로 늘어난다.
+	// TODO: 0 난이도에 따라서 골드 드랍양이 y배로 늘어난다.
+	// TODO: 2 골드 드랍 +% 스탯에 따라서 골드 드랍양이 늘어난다.
+	int32 GoldAmountMultiplier = 6;
+	int32 GoldAmountMin = MonsterLevel;
+	int32 GoldAmountMax = MonsterLevel * GoldAmountMultiplier - 1;
+
+	TObjectPtr<UPrototypeItem> GoldItem = NewObject<UPrototypeItem>(GetWorld());
+	GoldItem->ItemType = TAG_Item_Type_Gold;
+	GoldItem->ItemStackAmount = FMath::RandRange(GoldAmountMin, GoldAmountMax);
+	GoldItem->ItemName = "골드"; // TODO: 0 데이터테이블의 스트링에서 가져온다.
+	GoldItem->Rarity = TAG_Item_Rarity_Normal;
+	return GoldItem;
 }
 
-TObjectPtr<UPrototypeItem> UPrototypeItemGenerator::GenerateItem_Equipment(FGameplayTag ItemType, int32 MonsterLevel, FTreasureClass* TreasureClass)
+TObjectPtr<UPrototypeItem> UPrototypeItemGenerator::GenerateItem_Equipment(FGameplayTag ItemType, int32 MonsterLevel, FTreasureClass* TreasureClass, FItemType* ItemTypeData)
 {
-	if (!IsValid(ItemTypeDataTable))
-	{
-		UE_LOG(LogTemp, Warning, TEXT("DataTable(ItemType) is not valid."));
-		return nullptr;
-	}
-
-	const FString Context;
-	FItemType* ItemTypeData = ItemTypeDataTable->FindRow<FItemType>(ItemType.GetTagName(), Context);
-	if (ItemTypeData == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("ItemType데이터 테이블에 (%s)에 해당하는 데이터가 없습니다."), *ItemType.ToString());
-		return nullptr;
-	} 
-
-	// 장비 아이템 생성
 	TObjectPtr<UPrototypeItem> EquipmentItem = NewObject<UPrototypeItem>(GetWorld());
 	EquipmentItem->ItemType = ItemType;
 	EquipmentItem->ItemStackAmount = 1;
 
 	// 아이템 레벨을 결정한다.
-	// TODO: 아이템 레벨 값의 범위를 데이터 테이블로 옮긴다.
+	// TODO: 0 아이템 레벨 값의 범위를 데이터 테이블로 옮긴다. 
 	int ItemLevel = FMath::RandRange(MonsterLevel - 1, MonsterLevel + 1);
 	EquipmentItem->ItemLevel = ItemLevel;
 
-	// 제일 높은 희귀도인 Unique부터 희귀도 랜덤뽑기
-	// TODO: ItemType에 ClassSpecific 정보를 추가한다.
-	EquipmentItem->Rarity = RollItemRarity(TAG_Item_Rarity_Unique, MonsterLevel, ItemLevel, TreasureClass, false);
+	// 아이템의 희귀도를 뽑는다.
+	// TODO: 1 ItemType에 ClassSpecific 정보를 추가한다.
+	bool bIsClassSpecificItem = false;
+	EquipmentItem->Rarity = RollItemRarity(MonsterLevel, ItemLevel, TreasureClass, bIsClassSpecificItem);
 
-	// TODO: 고유아이템이거나 세트아이템일 경우 UniqueItems.txt, SetItems.txt에서 뽑아서 드랍한다.
+	// TODO: 0 고유아이템이거나 세트아이템일 경우 UniqueItems.txt, SetItems.txt에서 뽑아서 드랍한다.
 	if (EquipmentItem->Rarity == TAG_Item_Rarity_Unique ||
 		EquipmentItem->Rarity == TAG_Item_Rarity_Set)
 	{
@@ -236,14 +294,13 @@ TObjectPtr<UPrototypeItem> UPrototypeItemGenerator::GenerateItem_Equipment(FGame
 		EquipmentItem->Rarity = TAG_Item_Rarity_Rare;
 	}
 
-
 	// 희귀도에 따라 접사를 붙인다.
-	// TODO: 희귀도에 따른 최대 접사 개수를 데이터 테이블로 옮긴다.
+	// TODO: 2 희귀도에 따른 최대 접사 개수를 데이터 테이블로 옮긴다.
 	RollItemAffixes(EquipmentItem);
 
-	// TODO: 접사에 따라 이름을 정한다.
+	// TODO: 3 접사에 따라 이름을 정한다.
 	
-	// TODO: 홈 보유 가능 여부에 따라 홈 갯수 추가한다.
+	// TODO: 3 홈 보유 가능 여부에 따라 홈 갯수 추가한다.
 	if (ItemTypeData->bCanHaveSockets)
 	{
 	}
@@ -251,113 +308,70 @@ TObjectPtr<UPrototypeItem> UPrototypeItemGenerator::GenerateItem_Equipment(FGame
 	return EquipmentItem;
 }
 
-FGameplayTag UPrototypeItemGenerator::RollItemRarity(FGameplayTag Rarity, int32 MonsterLevel, int32 ItemLevel, FTreasureClass* TreasureClass, bool bIsClassSpecific)
+FGameplayTag UPrototypeItemGenerator::RollItemRarity(int32 MonsterLevel, int32 ItemLevel, FTreasureClass* TreasureClass, bool bIsClassSpecificItem)
 {
-	if (TreasureClass == nullptr)
+	int32 FreqUnique = TreasureClass->FreqRarities.Contains(TAG_Item_Rarity_Unique) ? TreasureClass->FreqRarities[TAG_Item_Rarity_Unique] : 0;
+	int32 FreqSet = TreasureClass->FreqRarities.Contains(TAG_Item_Rarity_Set) ? TreasureClass->FreqRarities[TAG_Item_Rarity_Set] : 0;
+	int32 FreqRare = TreasureClass->FreqRarities.Contains(TAG_Item_Rarity_Rare) ? TreasureClass->FreqRarities[TAG_Item_Rarity_Rare] : 0;
+	int32 FreqMagic = TreasureClass->FreqRarities.Contains(TAG_Item_Rarity_Magic) ? TreasureClass->FreqRarities[TAG_Item_Rarity_Magic] : 0;
+	if (bIsClassSpecificItem)
 	{
-		return TAG_Item_Rarity_Normal;
-	}
-
-	int32 Quality = 1024;
-	int32 Divisor = 1024;
-	float MagicFindConstant = 1024.0f;
-	if (bIsClassSpecific)
-	{
-		if (Rarity.MatchesTag(TAG_Item_Rarity_Unique))
+		if (CheckItemRarityCalc(MonsterLevel, ItemLevel, Quality_ClassSpecific_Unique, Divisor_ClassSpecific_Unique, MagicFindConstant_Unique, FreqUnique))
 		{
-			Quality = Quality_ClassSpecific_Unique;
-			Divisor = Divisor_ClassSpecific_Unique;
-			MagicFindConstant = MagicFindConstant_Unique;
+			return TAG_Item_Rarity_Unique;
 		}
-		else if (Rarity.MatchesTag(TAG_Item_Rarity_Set))
+		if (CheckItemRarityCalc(MonsterLevel, ItemLevel, Quality_ClassSpecific_Set, Divisor_ClassSpecific_Set, MagicFindConstant_Set, FreqSet))
 		{
-			Quality = Quality_ClassSpecific_Set;
-			Divisor = Divisor_ClassSpecific_Set;
-			MagicFindConstant = MagicFindConstant_Set;
+			return TAG_Item_Rarity_Set;
 		}
-		else if (Rarity.MatchesTag(TAG_Item_Rarity_Rare))
+		if (CheckItemRarityCalc(MonsterLevel, ItemLevel, Quality_ClassSpecific_Rare, Divisor_ClassSpecific_Rare, MagicFindConstant_Rare, FreqRare))
 		{
-			Quality = Quality_ClassSpecific_Rare;
-			Divisor = Divisor_ClassSpecific_Rare;
-			MagicFindConstant = MagicFindConstant_Rare;
+			return TAG_Item_Rarity_Rare;
 		}
-		else if (Rarity.MatchesTag(TAG_Item_Rarity_Magic))
+		if (CheckItemRarityCalc(MonsterLevel, ItemLevel, Quality_ClassSpecific_Magic, Divisor_ClassSpecific_Magic, MagicFindConstant_Magic, FreqMagic))
 		{
-			Quality = Quality_ClassSpecific_Magic;
-			Divisor = Divisor_ClassSpecific_Magic;
+			return TAG_Item_Rarity_Magic;
 		}
 	}
 	else
 	{
-		if (Rarity.MatchesTag(TAG_Item_Rarity_Unique))
+		if (CheckItemRarityCalc(MonsterLevel, ItemLevel, Quality_Unique, Divisor_Unique, MagicFindConstant_Unique, FreqUnique))
 		{
-			Quality = Quality_Unique;
-			Divisor = Divisor_Unique;
-			MagicFindConstant = MagicFindConstant_Unique;
+			return TAG_Item_Rarity_Unique;
 		}
-		else if (Rarity.MatchesTag(TAG_Item_Rarity_Set))
+		if (CheckItemRarityCalc(MonsterLevel, ItemLevel, Quality_Set, Divisor_Set, MagicFindConstant_Set, FreqSet))
 		{
-			Quality = Quality_Set;
-			Divisor = Divisor_Set;
-			MagicFindConstant = MagicFindConstant_Set;
+			return TAG_Item_Rarity_Set;
 		}
-		else if (Rarity.MatchesTag(TAG_Item_Rarity_Rare))
+		if (CheckItemRarityCalc(MonsterLevel, ItemLevel, Quality_Rare, Divisor_Rare, MagicFindConstant_Rare, FreqRare))
 		{
-			Quality = Quality_Rare;
-			Divisor = Divisor_Rare;
-			MagicFindConstant = MagicFindConstant_Rare;
+			return TAG_Item_Rarity_Rare;
 		}
-		else if (Rarity.MatchesTag(TAG_Item_Rarity_Magic))
+		if (CheckItemRarityCalc(MonsterLevel, ItemLevel, Quality_Magic, Divisor_Magic, MagicFindConstant_Magic, FreqMagic))
 		{
-			Quality = Quality_Magic;
-			Divisor = Divisor_Magic;
+			return TAG_Item_Rarity_Magic;
 		}
 	}
-	float BaseChance = (Quality - (MonsterLevel - ItemLevel) / Divisor) * 128;
-	// 매찬 적용
-	float MagicFindChance = 500.0f; // TODO: 캐릭터의 Attribute에서 MagicFind를 가져온다.
-	float EffectiveMagicFindChance = (MagicFindChance * MagicFindConstant) / (MagicFindChance + MagicFindConstant); // TODO: 0으로 나누는 경우가 있으면 조심해야됨
-	float EffectiveChance = BaseChance * 100.0f / (100.0f + EffectiveMagicFindChance);
-	float QualityConstant;
-	if (TreasureClass->FreqRarities.Contains(Rarity))
-	{
-		QualityConstant = (float)*TreasureClass->FreqRarities.Find(Rarity);
-	}
-	else
-	{
-		QualityConstant = 0;
-	}
-
-	float FinalChance = EffectiveChance * (1 - (QualityConstant / 1024));
-	float RandomValue = FMath::FRandRange(0, FinalChance - 1);
-	UE_LOG(LogTemp, Warning, TEXT("Rarity(%s) Check: MF Chance(%f), Eff Chance(%f), Final Chance(%f)"), *Rarity.ToString(), MagicFindChance, EffectiveChance, FinalChance);
-	if (RandomValue > 128)
-	{
-		if (Rarity.MatchesTag(TAG_Item_Rarity_Unique))
-		{
-			return RollItemRarity(TAG_Item_Rarity_Set, MonsterLevel, ItemLevel, TreasureClass, bIsClassSpecific);
-		}
-		else if (Rarity.MatchesTag(TAG_Item_Rarity_Set))
-		{
-			return RollItemRarity(TAG_Item_Rarity_Rare, MonsterLevel, ItemLevel, TreasureClass, bIsClassSpecific);
-		}
-		else if (Rarity.MatchesTag(TAG_Item_Rarity_Rare))
-		{
-			return RollItemRarity(TAG_Item_Rarity_Magic, MonsterLevel, ItemLevel, TreasureClass, bIsClassSpecific);
-		}
-	}
-	else
-	{
-		return Rarity;
-	}
-
 	return TAG_Item_Rarity_Normal;
+}
+
+bool UPrototypeItemGenerator::CheckItemRarityCalc(int32 MonsterLevel, int32 ItemLevel, int32 Quality, int32 Divisor, float MagicFindConst, int32 FreqRarity)
+{
+	// int<->float 형변환 주의!!
+	float BaseChance = (Quality - (MonsterLevel - ItemLevel) / Divisor) * 128;
+	float MagicFindChance = 500.0f; // TODO: 캐릭터의 Attribute에서 MagicFind를 가져온다.
+	float EffectiveMagicFindChance = (MagicFindChance * MagicFindConst) / (MagicFindChance + MagicFindConst); // 0으로 나누는 경우가 있을까??
+	float EffectiveChance = BaseChance * 100.0f / (100.0f + EffectiveMagicFindChance);
+	float FinalChance = EffectiveChance * (1 - ((float)FreqRarity / 1024));
+	float RandomValue = FMath::FRandRange(0, FinalChance - 1);
+	UE_LOG(LogTemp, Warning, TEXT("FinalChance(%f) RandomValue(%f)"), FinalChance, RandomValue);
+	return RandomValue < 128 ? true : false;
 }
 
 void UPrototypeItemGenerator::RollItemAffixes(TObjectPtr<UPrototypeItem> Item)
 {
 	// 지금은 Item에 대한 Rarity, Level이 다 정해져있다고 가정하고 Item을 매개변수로 받는데, 이렇게 하면 먼저 Rarity, Level을 정해야하므로 종속성이 생겨버림.
-	// TODO: Item의 Rarity, Level 등 데이터 종속성을 없애도록 리팩토링
+	// TODO: 3 Item의 Rarity, Level 등 데이터 종속성을 없애도록 리팩토링
 	// FGameplayTagContainer ItemPrefixGroupTags = Item->PrefixGroupTags; // Item클래스에 PrefixGroupTags.HasTag() 함수를 만드는게 나을수도 있음
 	// FGameplayTagContainer ItemSuffixGroupTags = Item->SuffixGroupTags;
 	FGameplayTag ItemType = Item->ItemType;
@@ -425,70 +439,10 @@ void UPrototypeItemGenerator::RollItemAffixes(TObjectPtr<UPrototypeItem> Item)
 	}
 	UE_LOG(LogTemp, Warning, TEXT("Roll Item Affix: MaxAffixCount(%d), PrefixCount(%d), SuffixCount(%d)"), MaxAffixCount, PrefixCount, SuffixCount);
 
-	// TODO: 이미 들어가있는 접사는 빼고 나머지에서 넣어야한다...
 	// 접두사를 넣는다.
-	for (int i = 0; i < PrefixCount; i++)
-	{
-		int64 TotalFreq = 0;
-		TArray<FItemAffix*> SpawnablePrefixes;
-		// TODO: 아이템 타입마다 미리 캐싱해놓는것도 괜찮을듯...?
-		for (auto& Prefix : ItemPrefixes)
-		{
-			if (Prefix->SpawnableItemTypes.HasTagExact(ItemType) && !Item->PrefixGroupTags.HasTag(Prefix->AffixGroup))
-			{
-				SpawnablePrefixes.Add(Prefix);
-				TotalFreq += Prefix->Frequency;
-			}
-		}
-
-		int64 RandomFreq = FMath::RandRange(0LL, TotalFreq);
-		int64 RandomFreqSum = 0;
-		for (auto& Prefix : SpawnablePrefixes)
-		{
-			RandomFreqSum += Prefix->Frequency;
-			if (RandomFreqSum >= RandomFreq)
-			{
-				Item->ItemAffixes.Add(Prefix);
-				Item->PrefixGroupTags.AddTag(Prefix->AffixGroup);
-				break;
-			}
-		}
-	}
-
+	AddItemAffixes(Item, TAG_Item_Affix_Type_Prefix, PrefixCount);
 	// 접미사를 넣는다.
-	for (int i = 0; i < SuffixCount; i++)
-	{
-		int64 TotalFreq = 0;
-		TArray<FItemAffix*> SpawnableSuffixes;
-		// TODO: 아이템 타입마다 미리 캐싱해놓는것도 괜찮을듯...?
-		for (auto& Suffix : ItemSuffixes)
-		{
-			if (Suffix->SpawnableItemTypes.HasTagExact(Item->ItemType) && !Item->SuffixGroupTags.HasTag(Suffix->AffixGroup))
-			{
-				SpawnableSuffixes.Add(Suffix);
-				TotalFreq += Suffix->Frequency;
-			}
-		}
-		int64 RandomFreq = FMath::RandRange(0LL, TotalFreq);
-		int64 RandomFreqSum = 0;
-		for (auto& Suffix : SpawnableSuffixes)
-		{
-			RandomFreqSum += Suffix->Frequency;
-			if (RandomFreqSum >= RandomFreq)
-			{
-				Item->ItemAffixes.Add(Suffix);
-				Item->SuffixGroupTags.AddTag(Suffix->AffixGroup);
-				break;
-			}
-		}
-	}
-
-	for (auto& Affix : Item->ItemAffixes)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Item Affix Added: %s"), *(Affix->InGameName));
-	}
-
-
+	AddItemAffixes(Item, TAG_Item_Affix_Type_Suffix, SuffixCount);
 	// TEST: 아이템 능력치 적용 테스트 코드
 	// 
 	/*
@@ -511,20 +465,50 @@ void UPrototypeItemGenerator::RollItemAffixes(TObjectPtr<UPrototypeItem> Item)
 	*/
 }
 
-TObjectPtr<UPrototypeItem> UPrototypeItemGenerator::GenerateItem_Gold(int32 MonsterLevel)
+void UPrototypeItemGenerator::AddItemAffixes(TObjectPtr<UPrototypeItem> Item, FGameplayTag AffixType, int32 AffixCount)
 {
-	// TODO: 골드 획득 배수를 데이터 테이블로 옮긴다.
-	// TODO: 정예몬스터면 골드 드랍양이 x배로 늘어난다.
-	// TODO: 난이도에 따라서 골드 드랍양이 y배로 늘어난다.
-	// TODO: 골드 드랍 +% 스탯에 따라서 골드 드랍양이 늘어난다.
-	int32 GoldAmountMultiplier = 6;
-	int32 GoldAmountMin = MonsterLevel;
-	int32 GoldAmountMax = MonsterLevel * GoldAmountMultiplier - 1;
-	
-	TObjectPtr<UPrototypeItem> GoldItem = NewObject<UPrototypeItem>(GetWorld());
-	GoldItem->ItemType = TAG_Item_Type_Gold;
-	GoldItem->ItemStackAmount = FMath::RandRange(GoldAmountMin, GoldAmountMax);
-	GoldItem->ItemName = "골드"; // TODO: 데이터테이블의 스트링에서 가져온다.
-	GoldItem->Rarity = TAG_Item_Rarity_Normal;
-	return GoldItem;
+	auto ItemAffixes = ItemAffixMap.Find(AffixType);
+	if (ItemAffixes == nullptr)
+	{
+		return;
+	}
+	// TODO: 게임플레이 태그 사용하는 거 타입제한없어서 너무 헷갈리니까 다 유틸리티함수로 만들어서 따로 빼자?
+	for (int i = 0; i < AffixCount; i++)
+	{
+		int64 TotalFreq = 0;
+		TArray<FItemAffix*> SpawnableAffixes;
+		for (auto& Affix : *ItemAffixes)
+		{
+			if (Affix->bOnlySpawnRare && Item->Rarity != TAG_Item_Rarity_Rare)
+			{
+				// 오직 Rare에서만 나오는 접사인데 아이템이 Rare가 아니라면 건너뛴다.
+				continue;
+			}
+			if (!Affix->SpawnableItemTypes.HasTagExact(Item->ItemType))
+			{
+				// 해당 접사가 스폰 가능한 ItemType이 아닐 경우 건너뛴다.
+				continue;
+			}
+			if (Item->HasAffixGroupTag(AffixType, Affix->AffixGroup))
+			{
+				// 해당 접사의 그룹 내 다른 접사가 이미 아이템에 있을 경우 건너뛴다.
+				continue;
+			}
+			SpawnableAffixes.Add(Affix);
+			TotalFreq += Affix->Frequency;
+		}
+		int64 RandomFreq = FMath::RandRange(0LL, TotalFreq);
+		int64 RandomFreqSum = 0;
+		for (auto& Affix : SpawnableAffixes)
+		{
+			RandomFreqSum += Affix->Frequency;
+			if (RandomFreqSum >= RandomFreq)
+			{
+				Item->ItemAffixes.Add(Affix);
+				auto AffixGroupTagContainer = Item->AffixGroupTagMap.FindOrAdd(AffixType);
+				AffixGroupTagContainer.AddTag(Affix->AffixGroup);
+				break;
+			}
+		}
+	}
 }
