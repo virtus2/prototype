@@ -281,6 +281,8 @@ TObjectPtr<UPrototypeItem> UPrototypeItemGenerator::GenerateItem_Equipment(FGame
 	int ItemLevel = FMath::RandRange(MonsterLevel - 1, MonsterLevel + 1);
 	EquipmentItem->ItemLevel = ItemLevel;
 
+	// TODO: 5 아이템 베이스를 결정한다. 아이템 베이스에 대한 데이터테이블을 만들어야돼...
+
 	// 아이템의 희귀도를 뽑는다.
 	// TODO: 1 ItemType에 ClassSpecific 정보를 추가한다.
 	bool bIsClassSpecificItem = false;
