@@ -10,7 +10,8 @@ UPrototypeItem::UPrototypeItem()
 	ItemType = FGameplayTag::EmptyTag;
 	EquipmentType = FGameplayTag::EmptyTag;
 	ItemLevel = 0;
-	ItemName = FName();
+	ItemBaseName = "Default Item";
+	ItemFullName = "Default Item";
 	ItemStackAmount = 0;
 }
 
@@ -20,7 +21,7 @@ void UPrototypeItem::DebugLog()
 		*ItemType.ToString(),
 		*EquipmentType.ToString(),
 		ItemLevel,
-		*ItemName.ToString(),
+		*ItemBaseName,
 		ItemStackAmount,
 		*Rarity.ToString()
 	);

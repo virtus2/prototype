@@ -8,10 +8,20 @@
 #include "ThirdPerson/Ability/AttributeGameplayEffectMap.h"
 #include "ThirdPerson/Data/TreasureClass.h"
 #include "ThirdPerson/Data/ItemAffix.h"
+#include "ThirdPerson/Data/Armor.h"
+#include "ThirdPerson/Data/Weapon.h"
 
 #include "PrototypeItemGenerator.generated.h"
 
+class UDataTable;
+class UAttributeGameplayEffectMap;
 class UPrototypeItem;
+struct FTreasureClass;
+struct FGamepalyTag;
+struct FItemType;
+struct FArmor;
+struct FWeapon;
+struct FTableRowBase;
 
 UCLASS()
 class THIRDPERSON_API UPrototypeItemGenerator : public UObject
@@ -42,8 +52,6 @@ private:
 protected:
 
 private:
-	UPROPERTY()
-	TObjectPtr<UAttributeGameplayEffectMap> ItemAffixAttributes;
 
 	UPROPERTY()
 	TObjectPtr<UDataTable> TreasureClassDataTable;
@@ -51,11 +59,31 @@ private:
 	UPROPERTY()
 	TObjectPtr<UDataTable> ItemTypeDataTable;
 
+
+	/* Item Affix Data */
+	UPROPERTY()
+	TObjectPtr<UAttributeGameplayEffectMap> ItemAffixAttributes;
+
 	UPROPERTY()
 	TObjectPtr<UDataTable> ItemAffixDataTable;
-
 	TArray<FItemAffix*> AllItemAffixes;
-	TMap<FGameplayTag, TArray<FItemAffix*>> ItemAffixMap;
+	TMap<FGameplayTag, TArray<FItemAffix*>> AffixTypeToAffixData;
+	/* End of Item Affix Data */
+
+
+	/* Equipment Item Data */
+	UPROPERTY()
+	TObjectPtr<UDataTable> ArmorDataTable;
+	TArray<FArmor*> AllArmorData;
+	TMap<FGameplayTag, TArray<FArmor*>> ItemTypeToArmorData;
+
+	UPROPERTY()
+	TObjectPtr<UDataTable> WeaponDataTable;
+	TArray<FWeapon*> AllWeaponData;
+	TMap<FGameplayTag, TArray<FWeapon*>> ItemTypeToWeaponData;
+
+	/* End of Equipment Item Data */
+
 	
 
 	/*

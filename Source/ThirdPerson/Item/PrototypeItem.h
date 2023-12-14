@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -43,11 +43,26 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	int ItemLevel;
 
+	/* 접사까지 포함한 아이템의 풀 네임 */
 	UPROPERTY(VisibleAnywhere)
-	FName ItemName;
+	FString ItemFullName;
+
+	/* 베이스 아이템의 이름 */
+	UPROPERTY(VisibleAnywhere)
+	FString ItemBaseName;
 
 	UPROPERTY(VisibleAnywhere)
 	int32 ItemStackAmount;
+
+	/*
+	* Armor Related Attributes
+	* 추후에 child class로 분리할수도 있음...
+	*/
+	UPROPERTY(VisibleAnywhere)
+	int32 Defense;
+	/* End of Armor Related Attributes */
+
+
 
 	TArray<FItemAffix*> ItemAffixes;
 

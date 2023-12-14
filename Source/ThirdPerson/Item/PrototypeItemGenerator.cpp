@@ -11,6 +11,9 @@
 #include "ThirdPerson/Data/TreasureClass.h"
 #include "ThirdPerson/Data/ItemAffix.h"
 #include "ThirdPerson/Data/ItemType.h"
+#include "ThirdPerson/Data/ItemBase.h"
+#include "ThirdPerson/Data/Weapon.h"
+#include "ThirdPerson/Data/Armor.h"
 #include "ThirdPerson/Item/PrototypeItem.h"
 #include "ThirdPerson/Item/PrototypeItemUtil.h"
 #include "ThirdPerson/Game/PrototypeGameModeBase.h"
@@ -32,26 +35,74 @@ UPrototypeItemGenerator::UPrototypeItemGenerator()
 		ItemTypeDataTable = ItemTypeDataTableClass.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UDataTable> ArmorDataTableClass(TEXT("/Game/Prototype/Data/DT_Armor.DT_Armor"));
+	if (IsValid(ArmorDataTableClass.Object))
+	{
+		ArmorDataTable = ArmorDataTableClass.Object;
+
+		const FString Context;
+		ArmorDataTable->GetAllRows(Context, AllArmorData);
+		for (auto& ArmorData : AllArmorData)
+		{
+			FGameplayTag ItemType = ArmorData->BaseData.ItemType;
+			if (ItemTypeToArmorData.Contains(ItemType))
+			{
+				ItemTypeToArmorData[ItemType].Add(ArmorData);
+			}
+			else
+			{
+				TArray<FArmor*> ArmorArray;
+				ItemTypeToArmorData.Add(ItemType, ArmorArray);
+				ItemTypeToArmorData[ItemType].Add(ArmorData);
+			}
+		}
+	}
+
+	static ConstructorHelpers::FObjectFinder<UDataTable> WeaponDataTableClass(TEXT("/Game/Prototype/Data/DT_Weapon.DT_Weapon"));
+	if (IsValid(WeaponDataTableClass.Object))
+	{
+		WeaponDataTable = WeaponDataTableClass.Object;
+
+		const FString Context;
+		WeaponDataTable->GetAllRows(Context, AllWeaponData);
+		for (auto& WeaponData : AllWeaponData)
+		{
+			FGameplayTag ItemType = WeaponData->BaseData.ItemType;
+			if (ItemTypeToWeaponData.Contains(ItemType))
+			{
+				ItemTypeToWeaponData[ItemType].Add(WeaponData);
+			}
+			else
+			{
+				TArray<FWeapon*> WeaponArray;
+				ItemTypeToWeaponData.Add(ItemType, WeaponArray);
+				ItemTypeToWeaponData[ItemType].Add(WeaponData);
+			}
+		}
+	}
+
 	static ConstructorHelpers::FObjectFinder<UDataTable> ItemAffixDataTableClass(TEXT("/Game/Prototype/Data/DT_ItemAffix.DT_ItemAffix"));
 	if (IsValid(ItemAffixDataTableClass.Object))
 	{
 		ItemAffixDataTable = ItemAffixDataTableClass.Object;
-
-		const FString Context;
-		ItemAffixDataTable->GetAllRows<FItemAffix>(Context, AllItemAffixes);
-		// AffixType에 따라 TMap에 Affix를 넣어둔다.
-		for(auto& Affix : AllItemAffixes)
+		if (IsValid(ItemAffixDataTable))
 		{
-			FGameplayTag AffixType = Affix->AffixType;
-			if (ItemAffixMap.Contains(AffixType))
+			const FString Context;
+			ItemAffixDataTable->GetAllRows<FItemAffix>(Context, AllItemAffixes);
+			// AffixType에 따라 TMap에 Affix를 넣어둔다.
+			for (auto& Affix : AllItemAffixes)
 			{
-				ItemAffixMap[Affix->AffixType].Add(Affix);
-			}
-			else
-			{
-				TArray<FItemAffix*> AffixArray;
-				ItemAffixMap.Add(Affix->AffixType, AffixArray);
-				ItemAffixMap[Affix->AffixType].Add(Affix);
+				FGameplayTag AffixType = Affix->AffixType;
+				if (AffixTypeToAffixData.Contains(AffixType))
+				{
+					AffixTypeToAffixData[AffixType].Add(Affix);
+				}
+				else
+				{
+					TArray<FItemAffix*> AffixArray;
+					AffixTypeToAffixData.Add(AffixType, AffixArray);
+					AffixTypeToAffixData[AffixType].Add(Affix);
+				}
 			}
 		}
 	}
@@ -265,7 +316,7 @@ TObjectPtr<UPrototypeItem> UPrototypeItemGenerator::GenerateItem_Gold(int32 Mons
 	TObjectPtr<UPrototypeItem> GoldItem = NewObject<UPrototypeItem>(GetWorld());
 	GoldItem->ItemType = TAG_Item_Type_Gold;
 	GoldItem->ItemStackAmount = FMath::RandRange(GoldAmountMin, GoldAmountMax);
-	GoldItem->ItemName = "골드"; // TODO: 0 데이터테이블의 스트링에서 가져온다.
+	GoldItem->ItemBaseName = "골드"; // TODO: 0 데이터테이블의 스트링에서 가져온다.
 	GoldItem->Rarity = TAG_Item_Rarity_Normal;
 	return GoldItem;
 }
@@ -281,7 +332,42 @@ TObjectPtr<UPrototypeItem> UPrototypeItemGenerator::GenerateItem_Equipment(FGame
 	int ItemLevel = FMath::RandRange(MonsterLevel - 1, MonsterLevel + 1);
 	EquipmentItem->ItemLevel = ItemLevel;
 
-	// TODO: 5 아이템 베이스를 결정한다. 아이템 베이스에 대한 데이터테이블을 만들어야돼...
+	// 드롭할 아이템을 결정한다.
+	// TODO: Equipment 타입마다 따로 TMap 만들지말구 하나의 TMap에 담기가 가능할까... 가능하면 리팩토링
+	// 함수 따로 만드는게 보기엔 나을수도
+	if (ItemType.MatchesTag(TAG_Item_Type_Equipment_Armor))
+	{
+		const auto ArmorData = ItemTypeToArmorData.Find(ItemType);
+		if (ArmorData != nullptr)
+		{
+			TArray<FArmor*> SpawnableArmor;
+			for (auto& Armor : *ArmorData)
+			{
+				// 스폰 불가한 아이템이면 건너뜀
+				if (!Armor->BaseData.bSpawnable)
+				{
+					continue;
+				}
+				// 드롭할 아이템 레벨보다 아이템데이터의 레벨이 더 높으면 건너뜀
+				if (ItemLevel < Armor->BaseData.Level)
+				{
+					continue;
+				}
+				SpawnableArmor.Add(Armor);
+			}
+
+			int SpawnableArmorCount = SpawnableArmor.Num();
+			if (SpawnableArmorCount > 0)
+			{
+				int RandomIndex = FMath::RandRange(0, SpawnableArmorCount - 1);
+				auto ArmorToSpawn = SpawnableArmor[RandomIndex];
+				ArmorToSpawn->BaseData.LevelRequirement;
+				EquipmentItem->ItemBaseName = ArmorToSpawn->BaseData.InGameName;
+				EquipmentItem->Defense = FMath::RandRange(ArmorToSpawn->MinDef, ArmorToSpawn->MaxDef);
+			}
+		}
+	}
+	
 
 	// 아이템의 희귀도를 뽑는다.
 	// TODO: 1 ItemType에 ClassSpecific 정보를 추가한다.
@@ -469,7 +555,7 @@ void UPrototypeItemGenerator::RollItemAffixes(TObjectPtr<UPrototypeItem> Item)
 
 void UPrototypeItemGenerator::AddItemAffixes(TObjectPtr<UPrototypeItem> Item, FGameplayTag AffixType, int32 AffixCount)
 {
-	auto ItemAffixes = ItemAffixMap.Find(AffixType);
+	auto ItemAffixes = AffixTypeToAffixData.Find(AffixType);
 	if (ItemAffixes == nullptr)
 	{
 		return;

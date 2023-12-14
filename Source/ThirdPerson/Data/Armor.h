@@ -2,16 +2,17 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
-#include "Item.h"
+#include "ItemBase.h"
 
 #include "Armor.generated.h"
 
-struct FItem;
-
 USTRUCT(BlueprintType)
-struct FArmor : public FItem
+struct FArmor : public FTableRowBase
 {
     GENERATED_BODY()
+    
+    UPROPERTY(EditAnywhere)
+    FItemBase BaseData;
     
     /* 최소 방어도 */
     UPROPERTY(EditAnywhere)
