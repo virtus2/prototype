@@ -14,22 +14,25 @@ UPrototypeItem::UPrototypeItem()
 	ItemBaseName = "Default Item";
 	ItemFullName = "Default Item";
 	ItemStackAmount = 0;
+	SocketCount = 0;
 }
 
 void UPrototypeItem::DebugLog()
 {
-	UE_LOG(LogTemp, Warning, TEXT("ItemType: %s, EquipmentType: %s, ItemLevel: %d, ItemFullName: %s, ItemStackAmount: %d, Rarity: %s"),
-		*ItemType.ToString(),
-		*EquipmentType.ToString(),
-		ItemLevel,
-		*ItemFullName,
-		ItemStackAmount,
-		*Rarity.ToString()
-	);
+	UE_LOG(LogTemp, Warning, TEXT("------ Item Log ------"));
+	UE_LOG(LogTemp, Warning, TEXT("ItemType :%s"), *ItemType.ToString());
+	UE_LOG(LogTemp, Warning, TEXT("EquipmentType :%s"), *EquipmentType.ToString());
+	UE_LOG(LogTemp, Warning, TEXT("ItemLevel :%d"), ItemLevel);
+	UE_LOG(LogTemp, Warning, TEXT("ItemFullName :%s"), *ItemFullName);
+	UE_LOG(LogTemp, Warning, TEXT("ItemStackAmount :%d"), ItemStackAmount);
+	UE_LOG(LogTemp, Warning, TEXT("SocketCount :%d"), SocketCount);
+	UE_LOG(LogTemp, Warning, TEXT("Rarity :%s"), *Rarity.ToString());
+
 	for (const auto& Affix : ItemAffixes)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Affix: %s"), *Affix->InGameName);
 	}
+	UE_LOG(LogTemp, Warning, TEXT("------ End of Item Log ------"));
 }
 
 void UPrototypeItem::AddAffix(FItemAffix* ItemAffixData)

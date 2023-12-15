@@ -24,8 +24,9 @@ struct FItemType : public FTableRowBase
 
     // TODO: 그냥 다른 데이터 테이블에서 정해주는 게 나을수도
     // 예를들면 Helmet타입은 15레벨 2개, 30레벨 3개, 45레벨 4개
+    // <Item Level, Max Socket Count>
     UPROPERTY(EditAnywhere, meta=(EditCondition="bCanHaveSockets"))
-    TMap<int32, int8> MaxSocketCount; // <Item Level, Max Socket Count>
+    TMap<int32, int8> ItemLevelToMaxSocketCount; 
     
     UPROPERTY(EditAnywhere)
     int TreasureClassPickWeight;

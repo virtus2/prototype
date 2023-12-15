@@ -418,7 +418,6 @@ TObjectPtr<UPrototypeItem> UPrototypeItemGenerator::GenerateItem_Equipment(FGame
 	RollItemAffixes(EquipmentItem);
 
 	// 접사에 따라 이름을 정한다.
-	// 
 	FString PrefixName;
 	FString SuffixName = " ";
 	for (const auto& ItemAffix : EquipmentItem->ItemAffixes)
@@ -436,9 +435,21 @@ TObjectPtr<UPrototypeItem> UPrototypeItemGenerator::GenerateItem_Equipment(FGame
 	}
 	EquipmentItem->ItemFullName = PrefixName.Append(EquipmentItem->ItemBaseName).Append(SuffixName);
 	
-	// TODO: 3 홈 보유 가능 여부에 따라 홈 갯수 추가한다.
+	// 홈 보유 가능 여부에 따라 홈을 추가한다.
 	if (ItemTypeData->bCanHaveSockets)
 	{
+		TArray<int32> PossibleItemLevels;
+		int32 MaxSocketCount = 0;
+		ItemTypeData->ItemLevelToMaxSocketCount.GetKeys(PossibleItemLevels);
+		for (int i = 0; i < PossibleItemLevels.Num(); i++)
+		{
+			if (ItemLevel >= PossibleItemLevels[i])
+			{
+				MaxSocketCount = ItemTypeData->ItemLevelToMaxSocketCount[PossibleItemLevels[i]];
+			}
+		}
+
+		EquipmentItem->SocketCount = FMath::RandRange(0, MaxSocketCount);
 	}
 
 	return EquipmentItem;

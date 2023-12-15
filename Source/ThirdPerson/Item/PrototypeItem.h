@@ -65,15 +65,15 @@ public:
 	*/
 	UPROPERTY(VisibleAnywhere)
 	int32 Defense;
+
+	UPROPERTY(VisibleAnywhere)
+	int32 SocketCount;
 	/* End of Equipment Item Related Attributes */
 
 
 
 	TArray<FItemAffix*> ItemAffixes;
 	FGameplayTagContainer AffixGroupTagContainer;
-	// Key: Item.Affix.Type.XXX
-	// Value: Item.Affix.Group.XXX
-	TMap<FGameplayTag, FGameplayTagContainer*> AffixTypeToAffixGroup;
 protected:
 	
 
