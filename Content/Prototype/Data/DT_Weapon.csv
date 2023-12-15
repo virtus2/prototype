@@ -1,0 +1,3 @@
+---,BaseData
+HandAxe,"(InGameName=""Hand Axe"",ItemType=(TagName=""Item.Type.Equipment.Weapon.Axe""),ItemMesh=""/Script/Engine.SkeletalMesh'/Game/Weapon_Pack/Skeletal_Mesh/SK_Axe.SK_Axe'"",ItemSprite=None,Level=1,LevelRequirement=0,Rarity=1,bSpawnable=True)"
+LongSword,"(InGameName=""Long Sword"",ItemType=(TagName=""Item.Type.Equipment.Weapon.Sword""),ItemMesh=None,ItemSprite=None,Level=1,LevelRequirement=0,Rarity=1,bSpawnable=True)"
