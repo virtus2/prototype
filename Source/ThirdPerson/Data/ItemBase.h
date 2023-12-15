@@ -17,6 +17,12 @@ struct FItemBase
     FGameplayTag ItemType;
 
     UPROPERTY(EditAnywhere)
+    USkeletalMesh* ItemMesh;
+
+    UPROPERTY(EditAnywhere)
+    UTexture2D* ItemSprite;
+
+    UPROPERTY(EditAnywhere)
     int32 Level = 1;
 
     UPROPERTY(EditAnywhere)
