@@ -10,6 +10,7 @@ UPrototypeItem::UPrototypeItem()
 	ItemType = FGameplayTag::EmptyTag;
 	EquipmentType = FGameplayTag::EmptyTag;
 	ItemLevel = 0;
+	LevelRequirement = 0;
 	ItemBaseName = "Default Item";
 	ItemFullName = "Default Item";
 	ItemStackAmount = 0;
@@ -17,11 +18,11 @@ UPrototypeItem::UPrototypeItem()
 
 void UPrototypeItem::DebugLog()
 {
-	UE_LOG(LogTemp, Warning, TEXT("ItemType: %s, EquipmentType: %s, ItemLevel: %d, ItemName: %s, ItemStackAmount: %d, Rarity: %s"),
+	UE_LOG(LogTemp, Warning, TEXT("ItemType: %s, EquipmentType: %s, ItemLevel: %d, ItemFullName: %s, ItemStackAmount: %d, Rarity: %s"),
 		*ItemType.ToString(),
 		*EquipmentType.ToString(),
 		ItemLevel,
-		*ItemBaseName,
+		*ItemFullName,
 		ItemStackAmount,
 		*Rarity.ToString()
 	);
@@ -31,12 +32,14 @@ void UPrototypeItem::DebugLog()
 	}
 }
 
+void UPrototypeItem::AddAffix(FItemAffix* ItemAffixData)
+{
+	ItemAffixes.Add(ItemAffixData);
+	// 같은 그룹의 접사가 또 붙는걸 방지하기 위해서 아이템에 접사의 그룹을 모두 추가해놓는다.
+	AffixGroupTagContainer.AddTag(ItemAffixData->AffixGroup);
+}
+
 bool UPrototypeItem::HasAffixGroupTag(FGameplayTag AffixType, FGameplayTag AffixGroup)
 {
-	auto AffixGroupTagContainer = AffixGroupTagMap.Find(AffixType);
-	if (AffixGroupTagContainer)
-	{
-		return AffixGroupTagContainer->HasTag(AffixGroup);
-	}
-	return false;
+	return AffixGroupTagContainer.HasTag(AffixGroup);
 }

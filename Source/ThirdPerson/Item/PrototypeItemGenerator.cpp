@@ -367,6 +367,37 @@ TObjectPtr<UPrototypeItem> UPrototypeItemGenerator::GenerateItem_Equipment(FGame
 			}
 		}
 	}
+	else if (ItemType.MatchesTag(TAG_Item_Type_Equipment_Weapon))
+	{
+		const auto WeaponData = ItemTypeToWeaponData.Find(ItemType);
+		if (WeaponData != nullptr)
+		{
+			TArray<FWeapon*> SpawnableWeapon;
+			for (auto& Weapon : *WeaponData)
+			{
+				// 스폰 불가한 아이템이면 건너뜀
+				if (!Weapon->BaseData.bSpawnable)
+				{
+					continue;
+				}
+				// 드롭할 아이템 레벨보다 아이템데이터의 레벨이 더 높으면 건너뜀
+				if (ItemLevel < Weapon->BaseData.Level)
+				{
+					continue;
+				}
+				SpawnableWeapon.Add(Weapon);
+			}
+
+			int SpawnableWeaponCount = SpawnableWeapon.Num();
+			if (SpawnableWeaponCount > 0)
+			{
+				int RandomIndex = FMath::RandRange(0, SpawnableWeaponCount - 1);
+				auto WeaponToSpawn = SpawnableWeapon[RandomIndex];
+				WeaponToSpawn->BaseData.LevelRequirement;
+				EquipmentItem->ItemBaseName = WeaponToSpawn->BaseData.InGameName;
+			}
+		}
+	}
 	
 
 	// 아이템의 희귀도를 뽑는다.
@@ -386,7 +417,24 @@ TObjectPtr<UPrototypeItem> UPrototypeItemGenerator::GenerateItem_Equipment(FGame
 	// TODO: 2 희귀도에 따른 최대 접사 개수를 데이터 테이블로 옮긴다.
 	RollItemAffixes(EquipmentItem);
 
-	// TODO: 3 접사에 따라 이름을 정한다.
+	// 접사에 따라 이름을 정한다.
+	// 
+	FString PrefixName;
+	FString SuffixName = " ";
+	for (const auto& ItemAffix : EquipmentItem->ItemAffixes)
+	{
+		if(ItemAffix->AffixType.MatchesTag(TAG_Item_Affix_Type_Prefix))
+		{
+			PrefixName.Append(ItemAffix->InGameName);
+			PrefixName.Append(" ");
+		}
+		else if (ItemAffix->AffixType.MatchesTag(TAG_Item_Affix_Type_Suffix))
+		{
+			SuffixName.Append(ItemAffix->InGameName);
+			SuffixName.Append(" ");
+		}
+	}
+	EquipmentItem->ItemFullName = PrefixName.Append(EquipmentItem->ItemBaseName).Append(SuffixName);
 	
 	// TODO: 3 홈 보유 가능 여부에 따라 홈 갯수 추가한다.
 	if (ItemTypeData->bCanHaveSockets)
@@ -592,9 +640,7 @@ void UPrototypeItemGenerator::AddItemAffixes(TObjectPtr<UPrototypeItem> Item, FG
 			RandomFreqSum += Affix->Frequency;
 			if (RandomFreqSum >= RandomFreq)
 			{
-				Item->ItemAffixes.Add(Affix);
-				auto AffixGroupTagContainer = Item->AffixGroupTagMap.FindOrAdd(AffixType);
-				AffixGroupTagContainer.AddTag(Affix->AffixGroup);
+				Item->AddAffix(Affix);
 				break;
 			}
 		}

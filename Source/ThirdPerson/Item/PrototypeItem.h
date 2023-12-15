@@ -23,6 +23,8 @@ public:
 	UPrototypeItem();
 
 	virtual void DebugLog();
+
+	void AddAffix(FItemAffix* ItemAffixData);
 	bool HasAffixGroupTag(FGameplayTag AffixType, FGameplayTag AffixGroup);
 
 protected:
@@ -43,6 +45,9 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	int ItemLevel;
 
+	UPROPERTY(VisibleAnywhere)
+	int32 LevelRequirement;
+
 	/* 접사까지 포함한 아이템의 풀 네임 */
 	UPROPERTY(VisibleAnywhere)
 	FString ItemFullName;
@@ -55,20 +60,20 @@ public:
 	int32 ItemStackAmount;
 
 	/*
-	* Armor Related Attributes
+	* Equipment Item Related Attributes
 	* 추후에 child class로 분리할수도 있음...
 	*/
 	UPROPERTY(VisibleAnywhere)
 	int32 Defense;
-	/* End of Armor Related Attributes */
+	/* End of Equipment Item Related Attributes */
 
 
 
 	TArray<FItemAffix*> ItemAffixes;
-
+	FGameplayTagContainer AffixGroupTagContainer;
 	// Key: Item.Affix.Type.XXX
 	// Value: Item.Affix.Group.XXX
-	TMap<FGameplayTag, FGameplayTagContainer> AffixGroupTagMap;
+	TMap<FGameplayTag, FGameplayTagContainer*> AffixTypeToAffixGroup;
 protected:
 	
 
