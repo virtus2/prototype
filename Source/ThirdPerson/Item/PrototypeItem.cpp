@@ -5,14 +5,16 @@
 
 #include "GameplayTagContainer.h"
 
+#include "ThirdPerson/Data/ItemBase.h"
+
 UPrototypeItem::UPrototypeItem()
 {
 	ItemType = FGameplayTag::EmptyTag;
 	EquipmentType = FGameplayTag::EmptyTag;
-	ItemLevel = 0;
+	Level = 0;
 	LevelRequirement = 0;
-	ItemBaseName = "Default Item";
-	ItemFullName = "Default Item";
+	BaseName = "Default Item";
+	FullName = "Default Item";
 	ItemStackAmount = 0;
 	SocketCount = 0;
 }
@@ -22,8 +24,8 @@ void UPrototypeItem::DebugLog()
 	UE_LOG(LogTemp, Warning, TEXT("------ Item Log ------"));
 	UE_LOG(LogTemp, Warning, TEXT("ItemType :%s"), *ItemType.ToString());
 	UE_LOG(LogTemp, Warning, TEXT("EquipmentType :%s"), *EquipmentType.ToString());
-	UE_LOG(LogTemp, Warning, TEXT("ItemLevel :%d"), ItemLevel);
-	UE_LOG(LogTemp, Warning, TEXT("ItemFullName :%s"), *ItemFullName);
+	UE_LOG(LogTemp, Warning, TEXT("ItemLevel :%d"), Level);
+	UE_LOG(LogTemp, Warning, TEXT("ItemFullName :%s"), *FullName);
 	UE_LOG(LogTemp, Warning, TEXT("ItemStackAmount :%d"), ItemStackAmount);
 	UE_LOG(LogTemp, Warning, TEXT("SocketCount :%d"), SocketCount);
 	UE_LOG(LogTemp, Warning, TEXT("Rarity :%s"), *Rarity.ToString());

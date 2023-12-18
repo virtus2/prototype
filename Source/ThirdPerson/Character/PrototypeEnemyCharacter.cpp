@@ -51,7 +51,7 @@ void APrototypeEnemyCharacter::SpawnTreasure()
 	{
 		return;
 	}
-	GameMode->ItemGenerator->GenerateItems(TreasureClass, MonsterLevel);
+	GameMode->ItemGenerator->SpawnItemsAt(TreasureClass, MonsterLevel, GetActorLocation());
 }
 
 void APrototypeEnemyCharacter::BeginPlay()

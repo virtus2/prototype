@@ -31,7 +31,8 @@ class THIRDPERSON_API UPrototypeItemGenerator : public UObject
 public:	
 	UPrototypeItemGenerator();
 
-	void GenerateItems(FGameplayTag TreasureClass, int32 MonsterLevel);
+	void GenerateItems(FGameplayTag TreasureClass, int32 MonsterLevel, /* out */ TArray<TObjectPtr<UPrototypeItem>>& GeneratedItems);
+	void SpawnItemsAt(FGameplayTag TreasureClass, int32 MonsterLevel, FVector Location);
 protected:
 
 private:
@@ -81,7 +82,6 @@ private:
 	TObjectPtr<UDataTable> WeaponDataTable;
 	TArray<FWeapon*> AllWeaponData;
 	TMap<FGameplayTag, TArray<FWeapon*>> ItemTypeToWeaponData;
-
 	/* End of Equipment Item Data */
 
 	

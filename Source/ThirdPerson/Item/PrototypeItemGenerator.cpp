@@ -15,6 +15,7 @@
 #include "ThirdPerson/Data/Weapon.h"
 #include "ThirdPerson/Data/Armor.h"
 #include "ThirdPerson/Item/PrototypeItem.h"
+#include "ThirdPerson/PrototypeItemActor.h"
 #include "ThirdPerson/Item/PrototypeItemUtil.h"
 #include "ThirdPerson/Game/PrototypeGameModeBase.h"
 #include "ThirdPerson/Character/PrototypeHeroCharacter.h"
@@ -120,7 +121,7 @@ UPrototypeItemGenerator::UPrototypeItemGenerator()
 /// <param name="TreasureClass"></param>
 /// <param name="MonsterLevel"></param>
 /// <returns></returns>
-void UPrototypeItemGenerator::GenerateItems(FGameplayTag TreasureClass, int32 MonsterLevel)
+void UPrototypeItemGenerator::GenerateItems(FGameplayTag TreasureClass, int32 MonsterLevel, TArray<TObjectPtr<UPrototypeItem>>& GeneratedItems)
 {
 	const FString Context;
 	FTreasureClass* TC = TreasureClassDataTable->FindRow<FTreasureClass>(TreasureClass.GetTagName(), Context);
@@ -143,7 +144,7 @@ void UPrototypeItemGenerator::GenerateItems(FGameplayTag TreasureClass, int32 Mo
 	}
 
 	// 2. 최종적으로 뽑힌 아이템타입들에 대해서, 아이템을 생성한다.
-	TArray<TObjectPtr<UPrototypeItem>> GeneratedItems;
+	// TArray<TObjectPtr<UPrototypeItem>> GeneratedItems;
 	for (const auto& ItemType : PickedItemTypes)
 	{
 		FItemType* ItemTypeData = ItemTypeDataTable->FindRow<FItemType>(ItemType.GetTagName(), Context);
@@ -171,6 +172,23 @@ void UPrototypeItemGenerator::GenerateItems(FGameplayTag TreasureClass, int32 Mo
 	for (const auto& Item : GeneratedItems)
 	{
 		Item->DebugLog();
+	}
+}
+
+void UPrototypeItemGenerator::SpawnItemsAt(FGameplayTag TreasureClass, int32 MonsterLevel, FVector Location)
+{
+	TArray<TObjectPtr<UPrototypeItem>> GeneratedItems;
+	GenerateItems(TreasureClass, MonsterLevel, GeneratedItems);
+	
+	auto World = GetWorld();
+	if (IsValid(World))
+	{
+		for (const auto& Item : GeneratedItems)
+		{
+			FRotator Rotator = FRotator::ZeroRotator;
+			auto ItemActor = World->SpawnActor<APrototypeItemActor>(Location, Rotator);
+			ItemActor->SetItem(Item);
+		}
 	}
 }
 
@@ -316,7 +334,7 @@ TObjectPtr<UPrototypeItem> UPrototypeItemGenerator::GenerateItem_Gold(int32 Mons
 	TObjectPtr<UPrototypeItem> GoldItem = NewObject<UPrototypeItem>(GetWorld());
 	GoldItem->ItemType = TAG_Item_Type_Gold;
 	GoldItem->ItemStackAmount = FMath::RandRange(GoldAmountMin, GoldAmountMax);
-	GoldItem->ItemBaseName = "골드"; // TODO: 0 데이터테이블의 스트링에서 가져온다.
+	GoldItem->BaseName = "골드"; // TODO: 0 데이터테이블의 스트링에서 가져온다.
 	GoldItem->Rarity = TAG_Item_Rarity_Normal;
 	return GoldItem;
 }
@@ -330,7 +348,7 @@ TObjectPtr<UPrototypeItem> UPrototypeItemGenerator::GenerateItem_Equipment(FGame
 	// 아이템 레벨을 결정한다.
 	// TODO: 0 아이템 레벨 값의 범위를 데이터 테이블로 옮긴다. 
 	int ItemLevel = FMath::RandRange(MonsterLevel - 1, MonsterLevel + 1);
-	EquipmentItem->ItemLevel = ItemLevel;
+	EquipmentItem->Level = ItemLevel;
 
 	// 드롭할 아이템을 결정한다.
 	// TODO: Equipment 타입마다 따로 TMap 만들지말구 하나의 TMap에 담기가 가능할까... 가능하면 리팩토링
@@ -361,8 +379,10 @@ TObjectPtr<UPrototypeItem> UPrototypeItemGenerator::GenerateItem_Equipment(FGame
 			{
 				int RandomIndex = FMath::RandRange(0, SpawnableArmorCount - 1);
 				auto ArmorToSpawn = SpawnableArmor[RandomIndex];
-				ArmorToSpawn->BaseData.LevelRequirement;
-				EquipmentItem->ItemBaseName = ArmorToSpawn->BaseData.InGameName;
+
+				EquipmentItem->LevelRequirement = ArmorToSpawn->BaseData.LevelRequirement;
+				EquipmentItem->Mesh = ArmorToSpawn->BaseData.ItemMesh;
+				EquipmentItem->BaseName = ArmorToSpawn->BaseData.Name;
 				EquipmentItem->Defense = FMath::RandRange(ArmorToSpawn->MinDef, ArmorToSpawn->MaxDef);
 			}
 		}
@@ -393,8 +413,10 @@ TObjectPtr<UPrototypeItem> UPrototypeItemGenerator::GenerateItem_Equipment(FGame
 			{
 				int RandomIndex = FMath::RandRange(0, SpawnableWeaponCount - 1);
 				auto WeaponToSpawn = SpawnableWeapon[RandomIndex];
-				WeaponToSpawn->BaseData.LevelRequirement;
-				EquipmentItem->ItemBaseName = WeaponToSpawn->BaseData.InGameName;
+
+				EquipmentItem->LevelRequirement = WeaponToSpawn->BaseData.LevelRequirement;
+				EquipmentItem->Mesh = WeaponToSpawn->BaseData.ItemMesh;
+				EquipmentItem->BaseName = WeaponToSpawn->BaseData.Name;
 			}
 		}
 	}
@@ -405,10 +427,10 @@ TObjectPtr<UPrototypeItem> UPrototypeItemGenerator::GenerateItem_Equipment(FGame
 	bool bIsClassSpecificItem = false;
 	EquipmentItem->Rarity = RollItemRarity(MonsterLevel, ItemLevel, TreasureClass, bIsClassSpecificItem);
 
-	// TODO: 0 고유아이템이거나 세트아이템일 경우 UniqueItems.txt, SetItems.txt에서 뽑아서 드랍한다.
 	if (EquipmentItem->Rarity == TAG_Item_Rarity_Unique ||
 		EquipmentItem->Rarity == TAG_Item_Rarity_Set)
 	{
+		// 고유아이템이거나 세트아이템일 경우 UniqueItems.txt, SetItems.txt에서 뽑아서 드랍한다.
 		// 현재는 고유아이템이나 세트아이템을 구현하지 않음
 		EquipmentItem->Rarity = TAG_Item_Rarity_Rare;
 	}
@@ -433,7 +455,7 @@ TObjectPtr<UPrototypeItem> UPrototypeItemGenerator::GenerateItem_Equipment(FGame
 			SuffixName.Append(" ");
 		}
 	}
-	EquipmentItem->ItemFullName = PrefixName.Append(EquipmentItem->ItemBaseName).Append(SuffixName);
+	EquipmentItem->FullName = PrefixName.Append(EquipmentItem->BaseName).Append(SuffixName);
 	
 	// 홈 보유 가능 여부에 따라 홈을 추가한다.
 	if (ItemTypeData->bCanHaveSockets)
@@ -523,7 +545,7 @@ void UPrototypeItemGenerator::RollItemAffixes(TObjectPtr<UPrototypeItem> Item)
 	// FGameplayTagContainer ItemSuffixGroupTags = Item->SuffixGroupTags;
 	FGameplayTag ItemType = Item->ItemType;
 	FGameplayTag Rarity = Item->Rarity;
-	int32 ItemLevel = Item->ItemLevel;
+	int32 ItemLevel = Item->Level;
 	// Item->ItemAffixes;
 
 	// 아이템에 붙을 수 있는 접사 갯수를 결정한다.

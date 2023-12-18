@@ -7,12 +7,13 @@
 #include "GameplayTagContainer.h"
 
 #include "ThirdPerson/Data/ItemAffix.h"
+#include "ThirdPerson/Data/ItemBase.h"
 
 #include "PrototypeItem.generated.h"
 
 
 /**
- * 
+  아이템 데이터
  */
 UCLASS()
 class THIRDPERSON_API UPrototypeItem : public UObject
@@ -34,6 +35,9 @@ private:
 
 public:
 	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<USkeletalMesh> Mesh;
+
+	UPROPERTY(VisibleAnywhere)
 	FGameplayTag ItemType;
 
 	UPROPERTY(VisibleAnywhere)
@@ -43,18 +47,18 @@ public:
 	FGameplayTag EquipmentType;
 
 	UPROPERTY(VisibleAnywhere)
-	int ItemLevel;
+	int Level;
 
 	UPROPERTY(VisibleAnywhere)
 	int32 LevelRequirement;
 
 	/* 접사까지 포함한 아이템의 풀 네임 */
 	UPROPERTY(VisibleAnywhere)
-	FString ItemFullName;
+	FString FullName;
 
 	/* 베이스 아이템의 이름 */
 	UPROPERTY(VisibleAnywhere)
-	FString ItemBaseName;
+	FString BaseName;
 
 	UPROPERTY(VisibleAnywhere)
 	int32 ItemStackAmount;
@@ -70,14 +74,11 @@ public:
 	int32 SocketCount;
 	/* End of Equipment Item Related Attributes */
 
-
-
 	TArray<FItemAffix*> ItemAffixes;
 	FGameplayTagContainer AffixGroupTagContainer;
 protected:
 	
 
 private:
-
 	
 };

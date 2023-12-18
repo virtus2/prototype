@@ -5,6 +5,7 @@
 
 #include "Components/BoxComponent.h"
 
+#include "ThirdPerson/Item/PrototypeItem.h"
 #include "ThirdPerson/Character/PrototypeHeroCharacter.h"
 
 // Sets default values
@@ -48,5 +49,11 @@ void APrototypeItemActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void APrototypeItemActor::SetItem(TObjectPtr<UPrototypeItem> ItemInstance)
+{
+	this->Item = ItemInstance;
+	SkeletalMeshComponent->SetSkeletalMesh(Item->Mesh);
 }
 

@@ -11,7 +11,7 @@ struct FItemBase
     GENERATED_BODY()
 
     UPROPERTY(EditAnywhere)
-    FString InGameName;
+    FString Name;
 
     UPROPERTY(EditAnywhere, meta = (Categories = "Item.Type"))
     FGameplayTag ItemType;
