@@ -3,6 +3,8 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 
+#include "ThirdPerson/PrototypeGameplayTags.h"
+
 #include "TreasureClass.generated.h"
 
 USTRUCT(BlueprintType)
@@ -50,7 +52,12 @@ struct FTreasureClass : public FTableRowBase
     int32 FreqNoDrop;
 
     UPROPERTY(EditAnywhere, meta=(ForceInlineRow))
-    TMap<FGameplayTag, int32> FreqRarities;
+    TMap<FGameplayTag, int32> FreqRarities{ 
+        {TAG_Item_Rarity_Unique, 800}, 
+        {TAG_Item_Rarity_Set, 800},
+        {TAG_Item_Rarity_Rare, 800},
+        {TAG_Item_Rarity_Magic, 1024},
+    };
 
     UPROPERTY(EditAnywhere, meta=(ShowOnlyInnerProperties, TitleProperty="{Treasure}가 {Probability}의 비율로 생성"))
     TArray<FTreasure> Treasures;

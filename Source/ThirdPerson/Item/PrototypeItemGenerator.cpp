@@ -21,6 +21,7 @@
 #include "ThirdPerson/Character/PrototypeHeroCharacter.h"
 #include "ThirdPerson/Player/PrototypePlayerState.h"
 #include "ThirdPerson/Ability/PrototypeAbilitySystemComponent.h"
+#include "EquipmentFactory.h"
 
 UPrototypeItemGenerator::UPrototypeItemGenerator()
 {
@@ -115,71 +116,36 @@ UPrototypeItemGenerator::UPrototypeItemGenerator()
 	}
 }
 
-/// <summary>
-/// TreasureClass에 따라 아이템을 랜덤으로 생성한다. 아이템 생성의 가장 최상위 함수.
-/// </summary>
-/// <param name="TreasureClass"></param>
-/// <param name="MonsterLevel"></param>
-/// <returns></returns>
-void UPrototypeItemGenerator::GenerateItems(FGameplayTag TreasureClass, int32 MonsterLevel, TArray<TObjectPtr<UPrototypeItem>>& GeneratedItems)
-{
-	const FString Context;
-	FTreasureClass* TC = TreasureClassDataTable->FindRow<FTreasureClass>(TreasureClass.GetTagName(), Context);
-	if (TC == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("DataTable(TreasureClass) FindRow(%s) is failed"), *TreasureClass.ToString());
-		return;
-	}
-
-	// 1. TC에서 ItemType을 뽑는다.
-	TArray<FGameplayTag> TCPickedItemTypes = RollTreasureClassPicks(TC, MonsterLevel);
-	
-	// 위에서 뽑은 ItemType에 대해서, 하위 ItemType을 랜덤하게 뽑는다.
-	// 예를 들면 Item.Type.Equipment의 하위 태그 중 하나를 뽑는다.
-	TArray<FGameplayTag> PickedItemTypes;
-	for (const auto& ItemType : TCPickedItemTypes)
-	{
-		FGameplayTag PickedItemType = PickItemType(ItemType, MonsterLevel);
-		PickedItemTypes.Add(PickedItemType);
-	}
-
-	// 2. 최종적으로 뽑힌 아이템타입들에 대해서, 아이템을 생성한다.
-	// TArray<TObjectPtr<UPrototypeItem>> GeneratedItems;
-	for (const auto& ItemType : PickedItemTypes)
-	{
-		FItemType* ItemTypeData = ItemTypeDataTable->FindRow<FItemType>(ItemType.GetTagName(), Context);
-		if (ItemTypeData == nullptr)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("ItemType데이터 테이블에 (%s)에 해당하는 데이터가 없습니다."), *ItemType.ToString());
-			return;
-		}
-
-		TObjectPtr<UPrototypeItem> Item;
-		if (ItemType.MatchesTag(TAG_Item_Type_Gold))
-		{
-			Item = GenerateItem_Gold(MonsterLevel);
-		}
-		if (ItemType.MatchesTag(TAG_Item_Type_Equipment))
-		{
-			Item = GenerateItem_Equipment(ItemType, MonsterLevel, TC, ItemTypeData);
-		}
-
-		GeneratedItems.Add(Item);
-	}
-
-	// 3. 생성한 아이템을 반환한다.
-	// TODO: 반환을 하던지 매개변수로 참조 받던지 해서 결과를 함수 밖으로 내보낼수있어야됨
-	for (const auto& Item : GeneratedItems)
-	{
-		Item->DebugLog();
-	}
-}
 
 void UPrototypeItemGenerator::SpawnItemsAt(FGameplayTag TreasureClass, int32 MonsterLevel, FVector Location)
 {
+	TArray<TObjectPtr<UPrototypeItem>> ItemsToSpawn;
+	// TreasureClass로부터 드롭할 아이템 타입을 뽑는다.
+	TArray<FGameplayTag> ItemTypes;
+	PickItemTypesFromTreasureClass(TreasureClass, ItemTypes);
+	for (const auto& ItemType : ItemTypes)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *(ItemType.GetTagName().ToString()));
+
+		// 타입에 따라 아이템을 생성한다.
+		// TODO: 빌더패턴? 팩토리 메서드 패턴? 인가 뭔가로 생성에 대한 구체적인 부분은 다른 클래스로 분리.
+		TObjectPtr<UPrototypeItem> ItemToGenerate;
+		if (ItemType.MatchesTag(TAG_Item_Type_Gold))
+		{
+			ItemToGenerate = GenerateItem_Gold(MonsterLevel);
+		}
+		else if (ItemType.MatchesTag(TAG_Item_Type_Equipment))
+		{
+			// ItemToGenerate = GenerateItem_Equipment(ItemType, MonsterLevel,)
+		}
+	}
+
+
+	/*
+	// 아이템을 생성한다.
 	TArray<TObjectPtr<UPrototypeItem>> GeneratedItems;
 	GenerateItems(TreasureClass, MonsterLevel, GeneratedItems);
-	
+
 	auto World = GetWorld();
 	if (IsValid(World))
 	{
@@ -190,135 +156,60 @@ void UPrototypeItemGenerator::SpawnItemsAt(FGameplayTag TreasureClass, int32 Mon
 			ItemActor->SetItem(Item);
 		}
 	}
+	*/
 }
 
-/// <summary>
-/// TC에 따라 드롭할 아이템 타입들을 뽑는다.
-/// TC가 ItemType일 경우 해당 타입을 뽑고, TC일 경우 재귀적으로 호출해서 뽑을 아이템 타입을 찾는다.
-/// https://www.inven.co.kr/board/diablo2/5734/6547의 [첫째, 드랍시킬 아이템의 종류 결정] 참고.
-/// </summary>
-TArray<FGameplayTag> UPrototypeItemGenerator::RollTreasureClassPicks(FTreasureClass* TreasureClass, int32 MonsterLevel)
-{
-	TArray<FTreasure> PickedTreasures;
-	if (TreasureClass->NumPicks < 0)
-	{
-		// TODO: NumPicks가 음수 일경우 확정적으로 N개를 드랍한다.
-	}
-	else
-	{
-		// TreasureClass에서 TC 또는 아이템을 하나 뽑는다.
-		for (int picksLeft = TreasureClass->NumPicks; picksLeft > 0; picksLeft--)
-		{
-			int ProbTotal = TreasureClass->FreqNoDrop;
-			for (const auto& Treasure : TreasureClass->Treasures)
-			{
-				ProbTotal += Treasure.Probability;
-			}
 
-			int RandomProb = FMath::RandRange(0, ProbTotal);
-			int ProbRollSum = 0;
-			for (const auto& Treasure : TreasureClass->Treasures)
+void UPrototypeItemGenerator::PickItemTypesFromTreasureClass(FGameplayTag TreasureClass, TArray<FGameplayTag>& OutItemTypes)
+{
+	const FString Context;
+	FTreasureClass* TC = TreasureClassDataTable->FindRow<FTreasureClass>(TreasureClass.GetTagName(), Context);
+	if (TC == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("DataTable(TreasureClass) FindRow(%s) is failed"), *TreasureClass.ToString());
+		return;
+	}
+
+	// TreasureClass의 Treasure 배열에서 Treasure 하나를 뽑는다. (Weighted Random Selection)
+	// Treasure의 가중치합 ProbTotal을 계산하고 [0, ProbTotal] 범위의 무작위 값을 하나 뽑는다.
+	// Treasure 목록을 순회하면서 해당 값을 넘는 Treasure가 처음으로 발견되었을 때, 이 Treasure가 당첨된다.
+	TArray<FTreasure> PickedTreasures;
+	for (int picksLeft = TC->NumPicks; picksLeft > 0; picksLeft--)
+	{
+		int ProbTotal = TC->FreqNoDrop;
+		for (const auto& Treasure : TC->Treasures)
+		{
+			ProbTotal += Treasure.Probability;
+		}
+
+		int RandomProb = FMath::RandRange(0, ProbTotal);
+		int ProbRollSum = 0;
+		for (const auto& Treasure : TC->Treasures)
+		{
+			ProbRollSum += Treasure.Probability;
+			if (ProbRollSum >= RandomProb)
 			{
-				ProbRollSum += Treasure.Probability;
-				if (ProbRollSum >= RandomProb)
-				{
-					PickedTreasures.Add(Treasure);
-					break;
-				}
+				PickedTreasures.Add(Treasure);
+				break;
 			}
 		}
 	}
 
-	TArray<FGameplayTag> PickedItemTypes;
+	// 찾은 Treasure가 ItemType일 경우엔 해당 타입을 추가하고, TreasureClass 일 경우엔 해당 TC로 다시 재귀호출해서 ItemType이 나올때까지 뽑는다.
+	// TODO: ItemType이 Item.Type.Equipment와 같이 제네릭 태그인 것에 대해서도 처리해야된다.
 	for (const auto& Treasure : PickedTreasures)
 	{
-		// 태그가 TC가 아닌 ItemType일 경우 해당 타입을 추가
 		if (Treasure.Treasure.MatchesTag(TAG_Item_Type))
 		{
 			FGameplayTag ItemTypeTag = Treasure.Treasure;
-			PickedItemTypes.Add(ItemTypeTag);
+			OutItemTypes.Add(ItemTypeTag);
 		}
-		// 태그가 TC일 경우 해당 TC로 다시 ItemType을 뽑는다
 		else if (Treasure.Treasure.MatchesTag(TAG_Item_Treasure))
 		{
 			FGameplayTag TreasureClassTag = Treasure.Treasure;
-			TArray<FGameplayTag> ItemTypes = RollTreasureClassPicks(TreasureClass, MonsterLevel);
-			PickedItemTypes.Append(ItemTypes);
+			PickItemTypesFromTreasureClass(TreasureClassTag, OutItemTypes);
 		}
 	}
-
-	return PickedItemTypes;
-}
-
-/// <summary>
-/// ItemType 태그의 최하위 타입을 하나 뽑는다.
-/// </summary>
-/// <param name="ItemType">: Item.Type.Armor과 같이 하위 타입일 수도 있고, Item.Type.Armor와 같이 상위 타입일 수도 있다.</param>
-FGameplayTag UPrototypeItemGenerator::PickItemType(FGameplayTag ItemType, int32 MonsterLevel)
-{
-	// ItemType이 Equipment와 같이 상위타입이거나, Armor와 같이 하위 타입일경우 최하위 장비 타입을 뽑는다.
-	if (ItemType.MatchesTag(TAG_Item_Type_Equipment))
-	{
-		return PickItemType_Equipment(ItemType);
-	}
-
-	// ItemType이 골드일 경우는 골드를 뽑는다. 골드는 최하위 타입이라 그대로 반환한다.
-	if (ItemType.MatchesTag(TAG_Item_Type_Gold))
-	{
-		return TAG_Item_Type_Gold;
-	}
-
-	UE_LOG(LogTemp, Warning, TEXT("ItemType(%s)에 해당하는 최하위 ItemType을 뽑을 수 없습니다."), *ItemType.ToString());
-	return FGameplayTag();
-}
-
-/// <summary>
-/// ItemType에 속해있는 태그 중 가장 하위 태그 하나를 찾는다.
-/// </summary>
-/// <param name="ItemType">: Item.Type.Equipment 또는 Item.Type.Equipment.XXX </param>
-FGameplayTag UPrototypeItemGenerator::PickItemType_Equipment(FGameplayTag ItemType)
-{
-	// 장비의 최상단 타입인 Equipment일 경우, 하위 타입 중 하나를 랜덤으로 다시 뽑는다.
-	// 예를 들면,
-	// Item.Type.Equipment
-	// - Item.Type.Equipment.Weapon
-	// - Item.Type.Equipment.Armor
-	// => Weapon, Armor 중 하나를 뽑는다.
-	if (ItemType.MatchesTagExact(TAG_Item_Type_Equipment))
-	{
-		auto TagNode = UGameplayTagsManager::Get().FindTagNode(ItemType);
-		auto ChildTagNodes = TagNode->GetChildTagNodes();
-		int RandomIndex = FMath::RandRange(0, ChildTagNodes.Num() - 1);
-		FGameplayTag PickedType = ChildTagNodes[RandomIndex].Get()->GetCompleteTag();
-		return PickItemType_Equipment(PickedType);
-	}
-
-	// 상위 타입 중에서 한 가지 최하위 ItemType을 뽑는다.
-	// 예를 들면 
-	// - Item.Type.Equipment.Armor 
-	// -- Item.Type.Equipment.Armor.Helmet
-	// -- Item.Type.Equipment.Armor.BodyArmor
-	// => Helmet, BodyArmor 중 하나를 뽑는다.
-	// 
-	// - Item.Type.Equipment.Weapon
-	// -- Item.Type.Equipment.Weapon.Sword
-	// -- Item.Type.Equipment.Weapon.Axe
-	// => Sword, Axe 중 하나를 뽑는다.
-	FGameplayTagContainer PickedItemTypes;
-	if (ItemType.MatchesTagExact(TAG_Item_Type_Equipment_Armor))
-	{
-		PickedItemTypes = UGameplayTagsManager::Get().RequestGameplayTagChildren(TAG_Item_Type_Equipment_Armor);
-	}
-	else if (ItemType.MatchesTagExact(TAG_Item_Type_Equipment_Weapon))
-	{
-		PickedItemTypes = UGameplayTagsManager::Get().RequestGameplayTagChildren(TAG_Item_Type_Equipment_Weapon);
-	}
-
-	// TODO: 1 아이템 타입마다 가중치를 준다. ItemType.txt
-	// 예를들면 디아블로2는 특정 클래스 전용 아이템은 가중치가 1, 일반 아이템은 가중치가 3이다
-	int RandomIndex = FMath::RandRange(0, PickedItemTypes.Num() - 1);
-	FGameplayTag PickedItemType = PickedItemTypes.GetByIndex(RandomIndex);
-	return PickedItemType;
 }
 
 TObjectPtr<UPrototypeItem> UPrototypeItemGenerator::GenerateItem_Gold(int32 MonsterLevel)

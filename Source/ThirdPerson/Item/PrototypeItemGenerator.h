@@ -16,6 +16,9 @@
 class UDataTable;
 class UAttributeGameplayEffectMap;
 class UPrototypeItem;
+class UEquipmentFactory;
+class UGoldFactory;
+class IItemFactory;
 struct FTreasureClass;
 struct FGamepalyTag;
 struct FItemType;
@@ -31,16 +34,12 @@ class THIRDPERSON_API UPrototypeItemGenerator : public UObject
 public:	
 	UPrototypeItemGenerator();
 
-	void GenerateItems(FGameplayTag TreasureClass, int32 MonsterLevel, /* out */ TArray<TObjectPtr<UPrototypeItem>>& GeneratedItems);
+public:
 	void SpawnItemsAt(FGameplayTag TreasureClass, int32 MonsterLevel, FVector Location);
-protected:
+
+	void PickItemTypesFromTreasureClass(FGameplayTag TreasureClass, TArray<FGameplayTag>& OutItemTypes);
 
 private:
-	TArray<FGameplayTag> RollTreasureClassPicks(FTreasureClass* TreasureClass, int32 MonsterLevel);
-
-	FGameplayTag PickItemType(FGameplayTag ItemType, int32 MonsterLevel);
-    FGameplayTag PickItemType_Equipment(FGameplayTag ItemType);
-
 	TObjectPtr<UPrototypeItem> GenerateItem_Gold(int32 MonsterLevel);
 	TObjectPtr<UPrototypeItem> GenerateItem_Equipment(FGameplayTag ItemType, int32 MonsterLevel, FTreasureClass* TreasureClass, FItemType* ItemTypeData);
 
